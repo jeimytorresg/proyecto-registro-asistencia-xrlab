@@ -1,0 +1,30 @@
+{
+  "name": "xrlab",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sistema XRLAB de registro de asistencia, permanencia y evidencia de actividades.",
+  "scripts": {
+    "web:start": "npm --prefix apps/web run start:dev",
+    "web:build": "npm --prefix apps/web run build",
+    "web:test": "npm --prefix apps/web test",
+    "functions:install": "npm --prefix functions install",
+    "functions:build": "npm --prefix functions run build",
+    "database:install": "npm --prefix database install",
+    "database:migrate": "npm --prefix database run migrate",
+    "database:seed": "npm --prefix database run seed",
+    "database:verify": "npm --prefix database run verify",
+    "emulators": "firebase emulators:start --only hosting,functions,auth",
+    "web:build:dev": "npm --prefix apps/web run build:dev",
+    "auth:seed:emulator": "npm --prefix functions run seed:auth-emulator",
+    "database:seed:users": "npm --prefix database run seed:users",
+    "pc1:verify": "npm --prefix functions run verify:pc1",
+    "database:migrate:pc2": "npm --prefix database run migrate:pc2",
+    "database:reset:pc2": "npm --prefix database run reset:pc2",
+    "pc2:verify": "npm --prefix functions run verify:pc2",
+    "database:reset:pc3": "npm --prefix database run reset:pc3",
+    "pc3:verify": "npm --prefix functions run verify:pc3",
+    "database:migrate:pc4": "npm --prefix database run migrate:pc4",
+    "database:reset:pc4": "npm --prefix database run reset:pc4",
+    "pc4:verify": "npm --prefix functions run verify:pc4"
+  }
+}

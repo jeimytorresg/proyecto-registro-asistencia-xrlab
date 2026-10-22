@@ -1,0 +1,33 @@
+node_modules/
+dist/
+.firebase/
+.firebase-debug.log
+firebase-debug.*.log
+
+# Angular
+apps/web/.angular/
+apps/web/dist/
+
+# Firebase Functions
+functions/lib/
+functions/node_modules/
+functions/.env
+functions/.env.*
+functions/.secret.local
+
+# Database
+database/node_modules/
+database/.env
+
+# Local / OS
+.env
+.env.*
+*.local
+.DS_Store
+Thumbs.db
+
+# Do not ignore examples
+!.env.example
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

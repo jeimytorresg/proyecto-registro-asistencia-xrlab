@@ -1,0 +1,22 @@
+{
+  "name": "xrlab-database",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "migrate": "node scripts/run-sql.mjs migrations/0001_init.sql",
+    "seed": "node scripts/run-sql.mjs seeds/0001_seed_dev.sql",
+    "verify": "node scripts/verify.mjs",
+    "seed:users": "node scripts/run-sql.mjs seeds/0002_seed_dev_users.sql",
+    "migrate:pc2": "node scripts/run-sql.mjs migrations/0002_pc2_kiosk_qr_indexes.sql",
+    "reset:pc2": "node scripts/run-sql.mjs seeds/0003_reset_pc2_dev.sql",
+    "reset:pc3": "node scripts/run-sql.mjs seeds/0004_reset_pc3_dev.sql",
+    "migrate:pc4": "node scripts/run-sql.mjs migrations/0003_pc4_admin_manual_audit.sql",
+    "reset:pc4": "node scripts/run-sql.mjs seeds/0005_reset_pc4_dev.sql"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "pg": "^8.13.0",
+    "xrlab": "file:.."
+  }
+}

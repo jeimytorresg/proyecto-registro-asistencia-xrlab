@@ -1,0 +1,40 @@
+{
+  "name": "xrlab-functions",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "seed:auth-emulator": "node scripts/seed-auth-emulator.mjs",
+    "verify:pc1": "node scripts/pc1-verify-auth.mjs",
+    "verify:pc2": "node scripts/pc2-verify-flow.mjs",
+    "verify:pc3": "node scripts/pc3-verify-flow.mjs",
+    "verify:pc4": "node scripts/pc4-verify-admin.mjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^7.2.5",
+    "helmet": "^8.1.0",
+    "pg": "^8.21.0",
+    "xrlab": "file:..",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.0",
+    "@types/helmet": "^0.0.48",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "typescript": "^5.9.0"
+  }
+}

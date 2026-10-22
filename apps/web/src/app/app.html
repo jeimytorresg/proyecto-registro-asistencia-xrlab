@@ -1,0 +1,42 @@
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" routerLink="/login" aria-label="Ir al inicio">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img">
+          <path d="M12 2 3.8 5.4v6.1c0 5.1 3.5 9.9 8.2 11.2 4.7-1.3 8.2-6.1 8.2-11.2V5.4L12 2Zm0 2.2 6.2 2.6v4.7c0 4-2.5 7.7-6.2 9-3.7-1.3-6.2-5-6.2-9V6.8L12 4.2Zm-1 4.4h2v5.8h-2V8.6Zm0 7.2h2v2h-2v-2Z" />
+        </svg>
+      </span>
+      <span>
+        <strong>XRLAB</strong>
+        <small>Registro de asistencia</small>
+      </span>
+    </a>
+
+    <nav class="topbar-nav" aria-label="Rutas principales">
+      @if (auth.session(); as session) {
+        @if (session.role === 'STUDENT') {
+          <a routerLink="/student">Estudiante</a>
+        }
+
+        @if (session.role === 'ADMIN' || session.role === 'TEACHER') {
+          <a routerLink="/admin/dashboard">Panel</a>
+          <a routerLink="/kiosk">Kiosko</a>
+        }
+
+        <span class="session-pill">
+          {{ session.profile.firstName }} · {{ session.role }}
+        </span>
+
+        <button class="logout-button" type="button" (click)="logout()">
+          Salir
+        </button>
+      } @else {
+        <a routerLink="/login">Login</a>
+      }
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

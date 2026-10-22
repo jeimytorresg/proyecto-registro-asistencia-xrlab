@@ -1,0 +1,40 @@
+{
+  "name": "web",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --configuration development --host 127.0.0.1 --port 4300",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "build:dev": "ng build --configuration development",
+    "start:dev": "ng serve --configuration development --host 127.0.0.1 --port 4300"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.4",
+  "dependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.14",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "@angular/service-worker": "^21.2.0",
+    "@zxing/browser": "^0.2.0",
+    "firebase": "^12.13.0",
+    "qrcode": "^1.5.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "xrlab": "file:../.."
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.3",
+    "@angular/cli": "^21.2.3",
+    "@angular/compiler-cli": "^21.2.0",
+    "@types/qrcode": "^1.5.6",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}
