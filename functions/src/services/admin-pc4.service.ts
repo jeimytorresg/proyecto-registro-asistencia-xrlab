@@ -7,6 +7,7 @@ import {
   getAdminAttendanceList,
   type AttendanceListFilters,
 } from './admin.service.js';
+import { ensureAuthAccount } from './auth-accounts.service.js';
 
 export interface CatalogItem {
   id: string;
@@ -296,7 +297,7 @@ export async function listAdminCatalogs(authUser: AuthenticatedUser): Promise<Ad
         select distinct
           student.id,
           student.university_code,
-          student.email::text,
+          student.email::text as email,
           student.first_name,
           student.last_name,
           student.career_id,
@@ -308,7 +309,7 @@ export async function listAdminCatalogs(authUser: AuthenticatedUser): Promise<Ad
         where assignment.teacher_id = $1
           and assignment.active = true
           and period.is_active = true
-        order by student.email;
+        order by email;
       `
       : `
         select
@@ -386,7 +387,7 @@ export async function saveStudent(params: {
   authUser: AuthenticatedUser;
   input: SaveStudentInput;
   requestId: string;
-}): Promise<CatalogStudent> {
+}): Promise<CatalogStudent & { invitationPending: boolean }> {
   const client = await db.connect();
 
   try {
@@ -519,6 +520,12 @@ export async function saveStudent(params: {
 
     const student = studentResult.rows[0];
 
+    const account = await ensureAuthAccount(client, {
+      profileId: profile.rows[0].id,
+      role: 'STUDENT',
+      displayName: `${student.first_name} ${student.last_name}`,
+    });
+
     if (forcedTeacherId) {
       const activePeriod = await client.query<IdRow>(
         `select id from academic_periods where is_active = true limit 1;`,
@@ -564,6 +571,7 @@ export async function saveStudent(params: {
       careerId: student.career_id,
       practiceTypeId: student.practice_type_id,
       active: student.active,
+      invitationPending: account.invitationPending,
     };
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined);
@@ -571,6 +579,87 @@ export async function saveStudent(params: {
   } finally {
     client.release();
   }
+}
+
+async function prepareInvitation(params: {
+  authUser: AuthenticatedUser;
+  table: 'students' | 'teachers';
+  id: string;
+  role: 'STUDENT' | 'TEACHER';
+  requestId: string;
+  assertAccess?: (client: PoolClient) => Promise<void>;
+}): Promise<{ email: string; invitationPending: boolean }> {
+  const client = await db.connect();
+
+  try {
+    await client.query('BEGIN');
+    await params.assertAccess?.(client);
+
+    const result = await client.query<{ user_profile_id: string | null; first_name: string; last_name: string; active: boolean }>(
+      `select user_profile_id, first_name, last_name, active from ${params.table} where id = $1;`,
+      [params.id],
+    );
+    const row = result.rows[0];
+
+    if (!row?.user_profile_id) {
+      throw new ApiError(404, 'NOT_FOUND', 'Registro no encontrado.');
+    }
+
+    if (!row.active) {
+      throw new ApiError(409, 'INACTIVE', 'No se puede invitar a un registro desactivado.');
+    }
+
+    const account = await ensureAuthAccount(client, {
+      profileId: row.user_profile_id,
+      role: params.role,
+      displayName: `${row.first_name} ${row.last_name}`,
+    });
+
+    await insertAudit(client, {
+      actorUserId: params.authUser.profile.id,
+      actorRole: params.authUser.role,
+      action: 'INVITATION_SENT',
+      entityType: params.table,
+      entityId: params.id,
+      newData: { email: account.email },
+      source: 'API',
+      requestId: params.requestId,
+    });
+
+    await client.query('COMMIT');
+
+    return { email: account.email, invitationPending: account.invitationPending };
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => undefined);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function prepareStudentInvitation(params: {
+  authUser: AuthenticatedUser;
+  id: string;
+  requestId: string;
+}): Promise<{ email: string; invitationPending: boolean }> {
+  const actorTeacherId = await getTeacherIdForAuthUser(params.authUser);
+  return prepareInvitation({
+    ...params,
+    table: 'students',
+    role: 'STUDENT',
+    assertAccess: (client) => assertTeacherCanAccessStudent(client, actorTeacherId, params.id),
+  });
+}
+
+export async function prepareTeacherInvitation(params: {
+  authUser: AuthenticatedUser;
+  id: string;
+  requestId: string;
+}): Promise<{ email: string; invitationPending: boolean }> {
+  if (params.authUser.role !== 'ADMIN') {
+    throw new ApiError(403, 'ROLE_FORBIDDEN', 'Solo el administrador puede gestionar docentes.');
+  }
+  return prepareInvitation({ ...params, table: 'teachers', role: 'TEACHER' });
 }
 
 export async function deactivateStudent(params: {
@@ -621,7 +710,7 @@ export async function saveTeacher(params: {
   authUser: AuthenticatedUser;
   input: SaveTeacherInput;
   requestId: string;
-}): Promise<CatalogTeacher> {
+}): Promise<CatalogTeacher & { invitationPending: boolean }> {
   if (params.authUser.role !== 'ADMIN') {
     throw new ApiError(403, 'ROLE_FORBIDDEN', 'Solo el administrador puede gestionar docentes.');
   }
@@ -709,6 +798,12 @@ export async function saveTeacher(params: {
 
     const teacher = result.rows[0];
 
+    const account = await ensureAuthAccount(client, {
+      profileId: profile.rows[0].id,
+      role: 'TEACHER',
+      displayName: `${firstName} ${lastName}`,
+    });
+
     await insertAudit(client, {
       actorUserId: params.authUser.profile.id,
       actorRole: params.authUser.role,
@@ -728,6 +823,7 @@ export async function saveTeacher(params: {
       firstName: teacher.first_name,
       lastName: teacher.last_name,
       active: teacher.active,
+      invitationPending: account.invitationPending,
     };
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined);

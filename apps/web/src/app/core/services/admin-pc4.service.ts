@@ -10,6 +10,7 @@ import type {
   CatalogPeriod,
   CatalogStudent,
   CatalogTeacher,
+  InvitationResult,
 } from '../models/admin-pc4.models';
 import { ApiClientService } from './api-client.service';
 import { AuthService } from './auth.service';
@@ -41,16 +42,33 @@ export class AdminPc4Service {
     return this.unwrap(await this.api.post<CatalogItem, { name: string }>('/admin/practice-types', { name }));
   }
 
-  async saveStudent(body: Record<string, unknown>): Promise<CatalogStudent> {
-    return this.unwrap(await this.api.post<CatalogStudent, Record<string, unknown>>('/admin/students', body));
+  async saveStudent(body: Record<string, unknown>): Promise<CatalogStudent & InvitationResult> {
+    return this.unwrap(await this.api.post<CatalogStudent & InvitationResult, Record<string, unknown>>('/admin/students', body));
+  }
+
+  async inviteStudent(id: string): Promise<string> {
+    return this.sendInvitation(`/admin/students/${id}/invitation`);
   }
 
   async deactivateStudent(id: string): Promise<{ id: string; active: boolean }> {
     return this.unwrap(await this.api.post<{ id: string; active: boolean }, Record<string, never>>(`/admin/students/${id}/deactivate`, {}));
   }
 
-  async saveTeacher(body: Record<string, unknown>): Promise<CatalogTeacher> {
-    return this.unwrap(await this.api.post<CatalogTeacher, Record<string, unknown>>('/admin/teachers', body));
+  async saveTeacher(body: Record<string, unknown>): Promise<CatalogTeacher & { invitationPending: boolean }> {
+    return this.unwrap(await this.api.post<CatalogTeacher & { invitationPending: boolean }, Record<string, unknown>>('/admin/teachers', body));
+  }
+
+  async inviteTeacher(id: string): Promise<string> {
+    return this.sendInvitation(`/admin/teachers/${id}/invitation`);
+  }
+
+  /** Envía el correo de invitación si la cuenta aún no tiene contraseña. */
+  async sendInvitationIfPending(result: InvitationResult): Promise<boolean> {
+    if (!result.invitationPending) {
+      return false;
+    }
+    await this.auth.sendInvitationEmail(result.email);
+    return true;
   }
 
   async deactivateTeacher(id: string): Promise<{ id: string; active: boolean }> {
@@ -104,6 +122,12 @@ export class AdminPc4Service {
     link.download = `xrlab-asistencias-${new Date().toISOString().slice(0, 10)}.xlsx`;
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  private async sendInvitation(path: string): Promise<string> {
+    const result = this.unwrap(await this.api.post<InvitationResult, Record<string, never>>(path, {}));
+    await this.auth.sendInvitationEmail(result.email);
+    return result.email;
   }
 
   private unwrap<T>(response: ApiResponse<T>): T {

@@ -21,6 +21,8 @@ import {
   exportAttendanceExcel,
   listAdminCatalogs,
   listAuditLogs,
+  prepareStudentInvitation,
+  prepareTeacherInvitation,
   saveCatalogItem,
   saveKiosk,
   savePeriod,
@@ -260,6 +262,19 @@ adminRouter.post(
 );
 
 adminRouter.post(
+  '/students/:id/invitation',
+  requireAuth(['ADMIN', 'TEACHER']),
+  asyncHandler<AuthenticatedRequest>(async (req, res) => {
+    const result = await prepareStudentInvitation({
+      authUser: requireAuthUser(req),
+      id: Array.isArray(req.params['id']) ? req.params['id'][0] : req.params['id'],
+      requestId: String(res.locals['requestId']),
+    });
+    return sendOk(res, result, 'Cuenta lista para invitación.');
+  }),
+);
+
+adminRouter.post(
   '/teachers',
   requireAuth(['ADMIN']),
   asyncHandler<AuthenticatedRequest>(async (req, res) => {
@@ -283,6 +298,19 @@ adminRouter.post(
       requestId: String(res.locals['requestId']),
     });
     return sendOk(res, result, 'Docente desactivado.');
+  }),
+);
+
+adminRouter.post(
+  '/teachers/:id/invitation',
+  requireAuth(['ADMIN']),
+  asyncHandler<AuthenticatedRequest>(async (req, res) => {
+    const result = await prepareTeacherInvitation({
+      authUser: requireAuthUser(req),
+      id: Array.isArray(req.params['id']) ? req.params['id'][0] : req.params['id'],
+      requestId: String(res.locals['requestId']),
+    });
+    return sendOk(res, result, 'Cuenta lista para invitación.');
   }),
 );
 

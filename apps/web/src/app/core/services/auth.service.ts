@@ -6,6 +6,7 @@ import {
   connectAuthEmulator,
   getAuth,
   onIdTokenChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   type Auth,
@@ -157,6 +158,13 @@ export class AuthService {
     }
 
     return user.getIdToken(forceRefresh);
+  }
+
+  /** Envía el correo de Firebase para que el usuario defina su contraseña. */
+  async sendInvitationEmail(email: string): Promise<void> {
+    await sendPasswordResetEmail(this.getFirebaseAuth(), email, {
+      url: `${window.location.origin}/login`,
+    });
   }
 
   private initializeAuthListenerSafely(): void {

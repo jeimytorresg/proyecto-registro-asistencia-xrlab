@@ -1,3 +1,8 @@
+export interface InvitationResult {
+  email: string;
+  invitationPending: boolean;
+}
+
 export interface CatalogItem {
   id: string;
   name: string;
