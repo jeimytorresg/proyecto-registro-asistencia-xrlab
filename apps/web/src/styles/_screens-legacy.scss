@@ -1,6 +1,6 @@
 // Estilos de pantallas AÚN NO rediseñadas, portados a los tokens nuevos y sin duplicados.
 // Cada bloque se elimina cuando su pantalla se migra (ver plan de fases):
-//   login -> F3 | estudiante -> F4 | kiosko -> F5 | admin -> F2 y F6
+//   estudiante -> F4 | kiosko -> F5 (login y panel admin ya migrados)
 
 .page-grid {
   display: grid;
@@ -25,110 +25,12 @@
   color: var(--ink-2);
 }
 
-.status-list {
-  display: grid;
-  gap: var(--s-2);
-  padding: 0;
-  margin: 0;
-  list-style: none;
-
-  li {
-    padding: var(--s-3) var(--s-4);
-    border-left: 3px solid var(--blue-700);
-    border-radius: var(--r-control);
-    background: var(--paper);
-  }
-}
-
-.placeholder-layout,
 .kiosk-layout,
 .student-scan-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
   gap: var(--s-4);
   align-items: start;
-}
-
-.demo-credentials {
-  display: grid;
-  gap: var(--s-2);
-}
-
-.demo-credential {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--s-3);
-  padding: var(--s-3);
-  border: 1px solid var(--line);
-  border-radius: var(--r-control);
-  background: var(--paper);
-
-  strong,
-  small {
-    display: block;
-  }
-}
-
-// ---- Admin ----
-.admin-shell {
-  display: grid;
-  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
-  gap: var(--s-4);
-  align-items: start;
-}
-
-.admin-sidebar {
-  position: sticky;
-  top: var(--s-4);
-  display: grid;
-  gap: var(--s-2);
-
-  a {
-    display: block;
-    min-height: var(--tap);
-    padding: 0.65rem var(--s-3);
-    border-radius: var(--r-control);
-    color: var(--ink);
-    text-decoration: none;
-    font-weight: 600;
-
-    &:hover {
-      background: var(--blue-100);
-    }
-
-    &.active,
-    &[aria-current='page'] {
-      background: var(--blue-700);
-      color: #fff;
-    }
-  }
-}
-
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: var(--s-3);
-}
-
-.metric-card {
-  padding: var(--s-4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-panel);
-  background: var(--surface);
-
-  strong {
-    display: block;
-    color: var(--blue-900);
-    font-size: var(--fs-headline);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-  }
-
-  span {
-    color: var(--ink-2);
-    font-size: var(--fs-label);
-  }
 }
 
 // ---- Kiosko y escáner ----
@@ -219,16 +121,10 @@
 }
 
 @media (max-width: 860px) {
-  .placeholder-layout,
   .kiosk-layout,
   .student-scan-layout,
-  .admin-shell,
   .kiosk-session-panel {
     grid-template-columns: 1fr;
-  }
-
-  .admin-sidebar {
-    position: static;
   }
 
   .qr-display {

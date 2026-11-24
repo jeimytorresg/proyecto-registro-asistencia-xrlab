@@ -64,6 +64,15 @@
     }
   }
 
+  // Texto destructivo (desactivar, cerrar): sin relleno hasta que se pasa el cursor.
+  &.ghost.destructive {
+    color: var(--err-fg);
+
+    &:hover:not(:disabled) {
+      background: var(--err-bg);
+    }
+  }
+
   &.block {
     width: 100%;
   }

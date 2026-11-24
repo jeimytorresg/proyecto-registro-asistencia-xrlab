@@ -1,6 +1,7 @@
 // Panel y tabla.
 
-// Panel: borde fino, sin sombra. `.card` se mantiene como alias hasta migrar las pantallas.
+// Panel con borde: solo para pantallas aún no migradas (estudiante, kiosko).
+// `.card` es alias heredado y se elimina cuando migren.
 .panel,
 .card {
   padding: clamp(1rem, 3vw, 1.5rem);
@@ -24,15 +25,12 @@
   }
 }
 
-// Tabla. En escritorio es tabla; bajo 640px cada fila pasa a bloque
-// (requiere data-label en cada <td> para mostrar el nombre de la columna).
+// Tabla abierta: sin caja. La cabecera lleva una línea inferior y cada fila un filete.
+// Bajo 640px cada fila pasa a bloque (requiere data-label en cada <td>).
 .table-wrap,
 .table-scroll {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--r-panel);
-  background: var(--surface);
 }
 
 .table,
@@ -41,27 +39,24 @@
   width: 100%;
   border-collapse: collapse;
 
-  // Cifras tabulares solo en celdas numéricas (.num): esta fuente ensancha
-  // puntos y dos puntos en modo tabular, lo que deforma correos y textos.
+  // Fechas y duraciones nunca se parten en dos líneas.
   .num {
-    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   th,
   td {
-    padding: var(--s-3) var(--s-4);
+    padding: var(--s-4) var(--s-4) var(--s-4) 0;
     border-bottom: 1px solid var(--line);
     text-align: left;
     vertical-align: top;
   }
 
   th {
-    position: sticky;
-    top: 0;
-    background: var(--paper);
-    color: var(--ink-2);
+    border-bottom-color: var(--line-strong);
+    color: var(--ink-3);
     font-size: var(--fs-label);
-    font-weight: 650;
+    font-weight: 600;
     white-space: nowrap;
   }
 
@@ -69,17 +64,19 @@
     border-bottom: 0;
   }
 
-  tbody tr:hover {
-    background: color-mix(in srgb, var(--blue-100) 45%, transparent);
-  }
-
   td small {
     display: block;
     margin-top: 0.125rem;
   }
+
+  td .row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-2);
+  }
 }
 
-// Las tablas aún sin data-label conservan scroll interno (migran en la Fase 6).
+// Tablas heredadas sin data-label conservan scroll interno hasta migrar.
 .data-table {
   min-width: 720px;
 }
@@ -89,13 +86,6 @@
 }
 
 @media (max-width: 640px) {
-  .table-wrap:has(.table),
-  .table-scroll:has(.table) {
-    overflow: visible;
-    border: 0;
-    background: transparent;
-  }
-
   .table {
     thead {
       position: absolute;
@@ -114,17 +104,16 @@
     }
 
     tr {
-      margin-bottom: var(--s-3);
-      border: 1px solid var(--line);
-      border-radius: var(--r-panel);
-      background: var(--surface);
+      padding: var(--s-3) 0;
+      border-bottom: 1px solid var(--line-strong);
     }
 
     td {
       display: grid;
       grid-template-columns: minmax(6.5rem, 38%) 1fr;
       gap: var(--s-3);
-      border-bottom: 1px solid var(--line);
+      padding: var(--s-2) 0;
+      border-bottom: 0;
 
       &::before {
         content: attr(data-label);
@@ -133,13 +122,9 @@
         font-weight: 600;
       }
 
-      &:last-child {
-        border-bottom: 0;
-      }
-
       small {
         grid-column: 2;
-        margin-top: calc(var(--s-3) * -0.75);
+        margin-top: calc(var(--s-2) * -1);
       }
     }
   }

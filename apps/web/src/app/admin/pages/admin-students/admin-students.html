@@ -1,0 +1,116 @@
+<div class="page">
+  <header class="page-head">
+    <h1>Estudiantes</h1>
+  </header>
+
+  <section class="section">
+    <h2>{{ editing() ? 'Editar estudiante' : 'Registrar estudiante' }}</h2>
+
+    <form class="stack" [formGroup]="form" (ngSubmit)="save()">
+      <input type="hidden" formControlName="id" />
+      <div class="form-cols">
+        <div class="field">
+          <label for="s-code">Código</label>
+          <input id="s-code" formControlName="universityCode" />
+        </div>
+        <div class="field">
+          <label for="s-email">Correo</label>
+          <input id="s-email" type="email" formControlName="email" />
+        </div>
+        <div class="field">
+          <label for="s-first">Nombre</label>
+          <input id="s-first" formControlName="firstName" />
+        </div>
+        <div class="field">
+          <label for="s-last">Apellido</label>
+          <input id="s-last" formControlName="lastName" />
+        </div>
+        <div class="field">
+          <label for="s-career">Carrera</label>
+          <select id="s-career" formControlName="careerId">
+            <option value="">Sin carrera</option>
+            @for (career of catalogs()?.careers ?? []; track career.id) {
+              <option [value]="career.id">{{ career.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="s-practice">Tipo de práctica</label>
+          <select id="s-practice" formControlName="practiceTypeId">
+            <option value="">Sin tipo</option>
+            @for (type of catalogs()?.practiceTypes ?? []; track type.id) {
+              <option [value]="type.id">{{ type.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="s-teacher">Docente asignado</label>
+          <select id="s-teacher" formControlName="teacherId">
+            <option value="">Sin asignación</option>
+            @for (teacher of catalogs()?.teachers ?? []; track teacher.id) {
+              <option [value]="teacher.id">{{ teacher.institutionalEmail }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit">{{ editing() ? 'Guardar cambios' : 'Guardar estudiante' }}</button>
+        <button class="btn ghost" type="button" (click)="clear()">Limpiar</button>
+      </div>
+    </form>
+
+    @if (message(); as text) {
+      <app-alert kind="ok">{{ text }}</app-alert>
+    }
+    @if (error(); as text) {
+      <app-alert kind="err" title="No se pudo completar la acción">{{ text }}</app-alert>
+    }
+  </section>
+
+  <section class="section">
+    <h2>Estudiantes registrados @if (catalogs()) { <span class="count">({{ (catalogs()?.students ?? []).length }})</span> }</h2>
+
+    @if (!catalogs()) {
+      <div class="skeleton-rows" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+    } @else if ((catalogs()?.students ?? []).length === 0) {
+      <app-empty-state title="Aún no hay estudiantes" description="Registra el primero con el formulario de arriba." />
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Estudiante</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of catalogs()?.students ?? []; track student.id) {
+              <tr>
+                <td class="num" data-label="Código">{{ student.universityCode }}</td>
+                <td data-label="Estudiante">
+                  <strong>{{ student.firstName }} {{ student.lastName }}</strong>
+                  <small>{{ student.email }}</small>
+                </td>
+                <td data-label="Estado">
+                  <app-badge [kind]="student.active ? 'ok' : 'neutral'">{{ student.active ? 'Activo' : 'Inactivo' }}</app-badge>
+                </td>
+                <td data-label="Acciones">
+                  <div class="row-actions">
+                    <button class="btn ghost sm" type="button" (click)="edit(student)">Editar</button>
+                    @if (student.active) {
+                      <button class="btn ghost sm" type="button" (click)="invite(student.id)">Enviar invitación</button>
+                      <button class="btn ghost sm destructive" type="button" (click)="deactivate(student.id)">Desactivar</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

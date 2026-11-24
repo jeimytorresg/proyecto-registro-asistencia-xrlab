@@ -1,0 +1,80 @@
+<div class="page">
+  <header class="page-head">
+    <h1>Kioskos autorizados</h1>
+  </header>
+
+  <section class="section">
+    <h2>{{ editing() ? 'Editar kiosko' : 'Registrar kiosko' }}</h2>
+
+    <form class="stack" [formGroup]="form" (ngSubmit)="save()">
+      <input type="hidden" formControlName="id" />
+      <div class="form-cols">
+        <div class="field">
+          <label for="k-code">Código</label>
+          <input id="k-code" formControlName="code" />
+        </div>
+        <div class="field">
+          <label for="k-name">Nombre</label>
+          <input id="k-name" formControlName="name" />
+        </div>
+        <div class="field">
+          <label for="k-location">Ubicación</label>
+          <input id="k-location" formControlName="location" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit">{{ editing() ? 'Guardar cambios' : 'Guardar kiosko' }}</button>
+        <button class="btn ghost" type="button" (click)="clear()">Limpiar</button>
+      </div>
+    </form>
+
+    @if (message(); as text) {
+      <app-alert kind="ok">{{ text }}</app-alert>
+    }
+    @if (error(); as text) {
+      <app-alert kind="err" title="No se pudo completar la acción">{{ text }}</app-alert>
+    }
+  </section>
+
+  <section class="section">
+    <h2>Kioskos registrados @if (catalogs()) { <span class="count">({{ (catalogs()?.kiosks ?? []).length }})</span> }</h2>
+
+    @if (!catalogs()) {
+      <div class="skeleton-rows" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+    } @else if ((catalogs()?.kiosks ?? []).length === 0) {
+      <app-empty-state title="Aún no hay kioskos" description="Registra el primero con el formulario de arriba." />
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Kiosko</th>
+              <th>Ubicación</th>
+              <th>Última conexión</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (kiosk of catalogs()?.kiosks ?? []; track kiosk.id) {
+              <tr>
+                <td data-label="Kiosko">
+                  <strong>{{ kiosk.name }}</strong>
+                  <small>{{ kiosk.code }}</small>
+                </td>
+                <td data-label="Ubicación">{{ kiosk.location }}</td>
+                <td class="num" data-label="Última conexión">{{ fmt.date(kiosk.lastSeenAt) }}<small>{{ fmt.time(kiosk.lastSeenAt) }}</small></td>
+                <td data-label="Acciones">
+                  <div class="row-actions">
+                    <button class="btn ghost sm" type="button" (click)="edit(kiosk)">Editar</button>
+                    <button class="btn ghost sm destructive" type="button" (click)="deactivate(kiosk.id)">Desactivar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

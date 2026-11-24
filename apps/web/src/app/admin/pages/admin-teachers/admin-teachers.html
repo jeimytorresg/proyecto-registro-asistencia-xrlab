@@ -1,0 +1,83 @@
+<div class="page">
+  <header class="page-head">
+    <h1>Docentes</h1>
+  </header>
+
+  <section class="section">
+    <h2>{{ editing() ? 'Editar docente' : 'Registrar docente' }}</h2>
+
+    <form class="stack" [formGroup]="form" (ngSubmit)="save()">
+      <input type="hidden" formControlName="id" />
+      <div class="form-cols">
+        <div class="field">
+          <label for="t-email">Correo institucional</label>
+          <input id="t-email" type="email" formControlName="institutionalEmail" />
+        </div>
+        <div class="field">
+          <label for="t-first">Nombre</label>
+          <input id="t-first" formControlName="firstName" />
+        </div>
+        <div class="field">
+          <label for="t-last">Apellido</label>
+          <input id="t-last" formControlName="lastName" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit">{{ editing() ? 'Guardar cambios' : 'Guardar docente' }}</button>
+        <button class="btn ghost" type="button" (click)="clear()">Limpiar</button>
+      </div>
+    </form>
+
+    @if (message(); as text) {
+      <app-alert kind="ok">{{ text }}</app-alert>
+    }
+    @if (error(); as text) {
+      <app-alert kind="err" title="No se pudo completar la acción">{{ text }}</app-alert>
+    }
+  </section>
+
+  <section class="section">
+    <h2>Docentes registrados @if (catalogs()) { <span class="count">({{ (catalogs()?.teachers ?? []).length }})</span> }</h2>
+
+    @if (!catalogs()) {
+      <div class="skeleton-rows" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+    } @else if ((catalogs()?.teachers ?? []).length === 0) {
+      <app-empty-state title="Aún no hay docentes" description="Registra el primero con el formulario de arriba." />
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Docente</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (teacher of catalogs()?.teachers ?? []; track teacher.id) {
+              <tr>
+                <td data-label="Docente">
+                  <strong>{{ teacher.firstName }} {{ teacher.lastName }}</strong>
+                  <small>{{ teacher.institutionalEmail }}</small>
+                </td>
+                <td data-label="Estado">
+                  <app-badge [kind]="teacher.active ? 'ok' : 'neutral'">{{ teacher.active ? 'Activo' : 'Inactivo' }}</app-badge>
+                </td>
+                <td data-label="Acciones">
+                  <div class="row-actions">
+                    <button class="btn ghost sm" type="button" (click)="edit(teacher)">Editar</button>
+                    @if (teacher.active) {
+                      <button class="btn ghost sm" type="button" (click)="invite(teacher.id)">Enviar invitación</button>
+                      <button class="btn ghost sm destructive" type="button" (click)="deactivate(teacher.id)">Desactivar</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

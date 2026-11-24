@@ -1,0 +1,272 @@
+:host {
+  display: block;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: clamp(18rem, 27vw, 30rem) minmax(0, 1fr); // la barra ocupa ~27% de la pantalla
+  min-height: 100dvh;
+}
+
+// ---- Barra lateral, pegada a la izquierda ----
+.side {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow-x: hidden; // los anillos decorativos sobresalen
+  overflow-y: auto;
+  padding: var(--s-7) clamp(1.25rem, 2.4vw, 2.5rem) var(--s-6);
+  background: var(--blue-900);
+  color: #fff;
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .name {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    font-weight: 650;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  .role {
+    margin: var(--s-1) 0 0;
+    color: #c9d6e2;
+    font-size: 1.125rem;
+  }
+
+  nav {
+    display: grid;
+    gap: var(--s-1);
+    margin-top: var(--s-7);
+  }
+
+  .foot {
+    display: grid;
+    gap: var(--s-1);
+    margin-top: auto;
+    padding-top: var(--s-5);
+    border-top: 1px solid rgb(255 255 255 / 0.16);
+  }
+
+  a,
+  button {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 3.5rem;
+    padding: 0 var(--s-4);
+    border: 0;
+    border-radius: var(--r-control);
+    background: transparent;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 550;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
+
+    &:hover {
+      background: rgb(255 255 255 / 0.1);
+    }
+
+    &.active {
+      background: #fff;
+      color: var(--blue-900);
+      font-weight: 650;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px var(--yellow-500);
+    }
+  }
+
+  // Motivo del sistema (mismo que el login), muy tenue para no competir con el menú.
+  .rings {
+    position: absolute;
+    z-index: 0;
+    right: -40%;
+    bottom: 12%;
+    width: 22rem;
+    fill: none;
+    stroke: #fff;
+    stroke-opacity: 0.07;
+    stroke-width: 1.5;
+    pointer-events: none;
+  }
+}
+
+.content {
+  min-width: 0;
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 4vw, 4rem) var(--s-8);
+}
+
+// Pantallas poco altas: el menú se compacta para que "Salir" siempre se vea.
+@media (min-width: 961px) and (max-height: 820px) {
+  .side {
+    padding-block: var(--s-5) var(--s-4);
+
+    nav {
+      margin-top: var(--s-4);
+    }
+
+    a,
+    button {
+      min-height: 3rem;
+      font-size: 1.125rem;
+    }
+  }
+}
+
+// ---- Móvil: barra inferior + hoja "Más" ----
+.bottom,
+.sheet,
+.scrim {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .side {
+    display: none;
+  }
+
+  .content {
+    padding-bottom: calc(var(--bottom-nav-h) + var(--s-7));
+  }
+
+  .bottom {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 20;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    height: var(--bottom-nav-h);
+    background: var(--blue-900);
+    padding-bottom: env(safe-area-inset-bottom);
+
+    a,
+    button {
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 2px;
+      border: 0;
+      background: transparent;
+      color: #c9d6e2;
+      font-size: var(--fs-caption);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+
+      &.active {
+        color: var(--yellow-500);
+      }
+
+      &:focus-visible {
+        box-shadow: inset 0 0 0 3px var(--yellow-500);
+      }
+    }
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: block;
+    background: rgb(10 37 64 / 0.5);
+  }
+
+  .sheet {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 40;
+    display: block;
+    max-height: 85dvh;
+    overflow-y: auto;
+    padding: var(--s-5) var(--s-5) calc(var(--s-5) + env(safe-area-inset-bottom));
+    border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+    background: var(--surface);
+    box-shadow: var(--shadow-float);
+    animation: sheet-in var(--dur-sheet) var(--ease-out);
+
+    .sheet-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--s-3);
+      margin-bottom: var(--s-4);
+    }
+
+    .name {
+      margin: 0;
+      font-size: var(--fs-title);
+      font-weight: 650;
+    }
+
+    .role {
+      margin: 0;
+      color: var(--ink-3);
+    }
+
+    .close {
+      display: grid;
+      place-items: center;
+      width: var(--tap);
+      height: var(--tap);
+      border: 0;
+      border-radius: var(--r-control);
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    nav {
+      display: grid;
+      border-top: 1px solid var(--line);
+
+      a,
+      button {
+        display: flex;
+        align-items: center;
+        gap: var(--s-3);
+        min-height: 3.25rem;
+        padding: 0;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        color: var(--ink);
+        font-size: 1.0625rem;
+        font-weight: 550;
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+
+        &.active {
+          color: var(--blue-700);
+          font-weight: 700;
+        }
+      }
+    }
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
+  }
+}

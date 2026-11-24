@@ -1,0 +1,87 @@
+<div class="page">
+  <header class="page-head">
+    <h1>Resumen operativo</h1>
+    <button class="btn secondary" type="button" [disabled]="isLoading()" [attr.aria-busy]="isLoading()" (click)="load()">
+      <app-icon [icon]="refreshIcon" />
+      {{ isLoading() ? 'Actualizando…' : 'Actualizar' }}
+    </button>
+  </header>
+
+  @if (error(); as currentError) {
+    <app-alert kind="err" title="No pudimos cargar el resumen">{{ currentError }}</app-alert>
+  }
+
+  @if (dashboard(); as data) {
+    <div class="kpis">
+      <div class="kpi feature">
+        <strong>{{ data.studentsInside }}</strong>
+        <span>Estudiantes dentro ahora</span>
+      </div>
+      <div class="kpi">
+        <strong>{{ data.entriesToday }}</strong>
+        <span>Entradas hoy</span>
+      </div>
+      <div class="kpi">
+        <strong>{{ data.exitsToday }}</strong>
+        <span>Salidas hoy</span>
+      </div>
+      <div class="kpi">
+        <strong>{{ data.incompleteSessions }}</strong>
+        <span>Sesiones incompletas</span>
+      </div>
+      <div class="kpi">
+        <strong>{{ fmt.number(data.totalHoursCurrentPeriod) }}</strong>
+        <span>Horas en el periodo</span>
+      </div>
+    </div>
+
+    <section class="section">
+      <h2>Últimos registros</h2>
+
+      @if (data.latestRows.length === 0) {
+        <app-empty-state
+          title="Todavía no hay registros"
+          description="Cuando un estudiante escanee el QR del kiosko, aparecerá aquí."
+        />
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Estado</th>
+                <th>Duración</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of data.latestRows; track row.id) {
+                <tr>
+                  <td data-label="Estudiante">
+                    <strong>{{ row.studentName }}</strong>
+                    <small>{{ row.studentEmail }}</small>
+                  </td>
+                  <td class="num" data-label="Entrada">{{ fmt.date(row.entryAt) }}<small>{{ fmt.time(row.entryAt) }}</small></td>
+                  <td class="num" data-label="Salida">{{ fmt.date(row.exitAt) }}<small>{{ fmt.time(row.exitAt) }}</small></td>
+                  <td data-label="Estado">
+                    <app-badge [kind]="fmt.status(row.status).kind">{{ fmt.status(row.status).label }}</app-badge>
+                  </td>
+                  <td class="num" data-label="Duración">{{ fmt.duration(row.durationMinutes) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  } @else if (isLoading()) {
+    <div class="kpis" aria-hidden="true">
+      <span class="skeleton kpi feature"></span>
+      <span class="skeleton kpi"></span>
+      <span class="skeleton kpi"></span>
+      <span class="skeleton kpi"></span>
+      <span class="skeleton kpi"></span>
+    </div>
+  }
+</div>

@@ -1,0 +1,73 @@
+<div class="page">
+  <header class="page-head">
+    <h1>Bitácora de acciones</h1>
+  </header>
+
+  <form class="filter-grid" [formGroup]="form" (ngSubmit)="load()">
+    <div class="field">
+      <label for="a-actor">Quién</label>
+      <input id="a-actor" formControlName="actor" placeholder="Correo del usuario" />
+    </div>
+    <div class="field">
+      <label for="a-action">Acción</label>
+      <input id="a-action" formControlName="action" />
+    </div>
+    <div class="field">
+      <label for="a-entity">Sobre qué</label>
+      <input id="a-entity" formControlName="entityType" />
+    </div>
+    <div class="field">
+      <label for="a-source">Origen</label>
+      <input id="a-source" formControlName="source" />
+    </div>
+    <div class="filter-actions">
+      <button class="btn" type="submit">Filtrar</button>
+    </div>
+  </form>
+
+  @if (error(); as text) {
+    <app-alert kind="err" title="No pudimos cargar la bitácora">{{ text }}</app-alert>
+  }
+
+  <section class="section">
+    <h2>Eventos @if (result()) { <span class="count">({{ result()?.total ?? 0 }})</span> }</h2>
+
+    @if (!result()) {
+      <div class="skeleton-rows" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+    } @else if ((result()?.rows ?? []).length === 0) {
+      <app-empty-state title="No hay eventos con esos filtros" description="Quita algún filtro para ver más resultados." />
+    } @else {
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Quién</th>
+              <th>Acción</th>
+              <th>Sobre qué</th>
+              <th>Origen</th>
+              <th>Motivo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of result()?.rows ?? []; track row.id) {
+              <tr>
+                <td class="num" data-label="Fecha">{{ fmt.date(row.createdAt) }}<small>{{ fmt.time(row.createdAt) }}</small></td>
+                <td data-label="Quién">
+                  {{ row.actorEmail ?? '—' }}
+                  @if (row.actorRole) {
+                    <small>{{ fmt.role(row.actorRole) }}</small>
+                  }
+                </td>
+                <td data-label="Acción">{{ row.action }}</td>
+                <td data-label="Sobre qué">{{ row.entityType }}</td>
+                <td data-label="Origen">{{ row.source }}</td>
+                <td data-label="Motivo">{{ row.reason ?? '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>

@@ -1,0 +1,80 @@
+<div class="shell">
+  <aside class="side">
+    <div class="who">
+      <p class="name">{{ name() }}</p>
+      <p class="role">{{ roleLabel() }}</p>
+    </div>
+
+    <nav aria-label="Panel">
+      @for (item of items(); track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page">
+          <app-icon [icon]="item.icon" [size]="24" />
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="foot">
+      <a routerLink="/kiosk"><app-icon [icon]="icons.qr" [size]="24" /> Abrir kiosko</a>
+      <button type="button" (click)="logout()"><app-icon [icon]="icons.logout" [size]="24" /> Salir</button>
+    </div>
+
+    <svg class="rings" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+      <circle cx="200" cy="200" r="60" />
+      <circle cx="200" cy="200" r="105" />
+      <circle cx="200" cy="200" r="150" />
+      <circle cx="200" cy="200" r="195" />
+    </svg>
+  </aside>
+
+  <main class="content" id="contenido">
+    <router-outlet />
+  </main>
+
+  <nav class="bottom" aria-label="Accesos rápidos">
+    @for (item of quickItems(); track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page">
+        <app-icon [icon]="item.icon" [size]="22" />
+        <span>{{ item.label }}</span>
+      </a>
+    }
+    <button type="button" [attr.aria-expanded]="moreOpen()" aria-controls="mas-menu" (click)="moreOpen.set(true)">
+      <app-icon [icon]="icons.more" [size]="22" />
+      <span>Más</span>
+    </button>
+  </nav>
+
+  @if (moreOpen()) {
+    <div class="scrim" (click)="moreOpen.set(false)" aria-hidden="true"></div>
+    <div
+      class="sheet"
+      id="mas-menu"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Más opciones"
+      cdkTrapFocus
+      [cdkTrapFocusAutoCapture]="true"
+      (keydown.escape)="moreOpen.set(false)"
+    >
+      <div class="sheet-head">
+        <div>
+          <p class="name">{{ name() }}</p>
+          <p class="role">{{ roleLabel() }}</p>
+        </div>
+        <button class="close" type="button" aria-label="Cerrar" (click)="moreOpen.set(false)">
+          <app-icon [icon]="icons.close" [size]="22" />
+        </button>
+      </div>
+
+      <nav aria-label="Más secciones">
+        @for (item of moreItems(); track item.path) {
+          <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page">
+            <app-icon [icon]="item.icon" [size]="22" /> {{ item.label }}
+          </a>
+        }
+        <a routerLink="/kiosk"><app-icon [icon]="icons.qr" [size]="22" /> Abrir kiosko</a>
+        <button type="button" (click)="logout()"><app-icon [icon]="icons.logout" [size]="22" /> Salir</button>
+      </nav>
+    </div>
+  }
+</div>

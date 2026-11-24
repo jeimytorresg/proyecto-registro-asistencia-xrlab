@@ -45,6 +45,7 @@ El login fija el lenguaje visual que siguen las demás fases. Es moderno, con co
 - **Un motivo gráfico por pantalla, nunca más:** los anillos concéntricos con el arco amarillo (eco del anillo del QR). Es decorativo, estático y con `aria-hidden`.
 - **Sin logotipo ni marca repetida** dentro del panel.
 - **Móvil:** el panel pasa arriba como banda compacta (solo titular); el contenido va debajo.
+- **Panel admin (acordado):** barra lateral oscura pegada a la izquierda (~27% del ancho, texto de 20 px) con nombre y rol del usuario (sin marca); en móvil, barra inferior con 3 accesos + "Más". Las páginas llevan solo el título, sin texto de apoyo ni tarjeta; las secciones se separan con un filete fuerte. Los KPIs usan una pieza destacada que ocupa 2 filas para que 5 piezas llenen la cuadrícula sin huecos.
 - Aplicación a las demás fases: el kiosko usa el panel oscuro y los anillos como protagonista; el estudiante abre con una banda oscura corta y el contenido sobre `--paper`; en admin el panel oscuro vive en la sidebar y las zonas de trabajo no llevan tarjeta si una línea o un espacio bastan.
 
 ## 3. Color
@@ -69,7 +70,7 @@ Una familia: **Schibsted Grotesk** (400, 500, 600, 700). Carga con `font-display
 Escala (solo estos tamaños): caption 13, label 14, body 16, title 20, headline 28, display 36-48. El kiosko usa `--fs-kiosk`.
 
 - Línea máxima 70 caracteres. Interlínea de cuerpo 1.55, de títulos 1.15.
-- Cifras tabulares (`font-variant-numeric: tabular-nums`) solo en celdas y contadores numéricos (clase `.num` / `.tabular`). Nunca en una tabla o un texto completo: en Schibsted Grotesk el modo tabular ensancha puntos y dos puntos y deforma correos y fechas.
+- **No usar cifras tabulares** (`tabular-nums`): en Schibsted Grotesk ensanchan puntos, comas y espacios y deforman fechas, correos y decimales. Los números se alinean con columnas de ancho fijo, no con la fuente. Decimales con coma (`es-EC`).
 - Sin mayúsculas sostenidas en etiquetas. Etiquetas de columna en sentido normal, peso 600.
 
 ## 5. Layout y navegación
@@ -90,7 +91,7 @@ Escala (solo estos tamaños): caption 13, label 14, body 16, title 20, headline 
 | Badge de estado | Píldora con ícono + texto: "Dentro", "Salió", "Incompleta", "Manual" |
 | Alerta | Ícono + título corto + qué hacer. Errores sin disculpas ni vaguedad |
 | Estado vacío | Qué falta y la acción para resolverlo |
-| Tabla | Escritorio: tabla con cabecera fija y cifras tabulares. Menos de 640 px: lista de filas apiladas (no scroll horizontal) |
+| Tabla | **Abierta, sin caja**: línea bajo la cabecera y un filete por fila. Fecha arriba y hora debajo, sin partir en dos líneas. Menos de 640 px: filas apiladas (sin scroll horizontal) |
 | Hoja inferior | Radio 20, sombra flotante, foco atrapado (Angular CDK) |
 | Filtros | Panel colapsable; en móvil, hoja inferior |
 

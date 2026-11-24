@@ -1,0 +1,72 @@
+<div class="page">
+  <header class="page-head">
+    <h1>Registro manual</h1>
+  </header>
+
+  <form class="section" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-cols">
+      <div class="field">
+        <label for="m-student">Estudiante</label>
+        <select id="m-student" formControlName="studentId">
+          <option value="">Selecciona un estudiante</option>
+          @for (student of catalogs()?.students ?? []; track student.id) {
+            <option [value]="student.id">{{ student.email }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="m-entry">Entrada</label>
+        <input id="m-entry" type="datetime-local" formControlName="entryAt" />
+      </div>
+      <div class="field">
+        <label for="m-exit">Salida</label>
+        <input id="m-exit" type="datetime-local" formControlName="exitAt" />
+      </div>
+      <div class="field">
+        <label for="m-teacher">Docente</label>
+        <select id="m-teacher" formControlName="teacherId">
+          <option value="">Asignar automáticamente</option>
+          @for (teacher of catalogs()?.teachers ?? []; track teacher.id) {
+            <option [value]="teacher.id">{{ teacher.institutionalEmail }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="m-kiosk">Kiosko</label>
+        <select id="m-kiosk" formControlName="kioskId">
+          <option value="">Sin kiosko</option>
+          @for (kiosk of catalogs()?.kiosks ?? []; track kiosk.id) {
+            <option [value]="kiosk.id">{{ kiosk.code }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="m-session">Registro a corregir</label>
+        <input id="m-session" formControlName="attendanceSessionId" placeholder="Déjalo vacío para crear uno nuevo" />
+        <span class="hint">Pega el identificador solo si vas a corregir un registro existente.</span>
+      </div>
+      <div class="field wide">
+        <label for="m-activities">Actividades</label>
+        <textarea id="m-activities" rows="4" formControlName="activities"></textarea>
+        <span class="hint">Escribe una actividad por línea.</span>
+      </div>
+      <div class="field wide">
+        <label for="m-reason">Motivo</label>
+        <textarea id="m-reason" rows="3" formControlName="reason"></textarea>
+        <span class="hint">Es obligatorio y queda en la bitácora.</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="submit">Guardar registro</button>
+      <button class="btn secondary" type="button" (click)="voidIncomplete()">Cerrar sesiones incompletas</button>
+    </div>
+
+    @if (message(); as text) {
+      <app-alert kind="ok">{{ text }}</app-alert>
+    }
+    @if (error(); as text) {
+      <app-alert kind="err" title="No se pudo guardar">{{ text }}</app-alert>
+    }
+  </form>
+</div>
