@@ -102,6 +102,41 @@ describe('API (e2e)', () => {
     });
   });
 
+  describe('auth (sin tocar la base de datos)', () => {
+    it('GET /api/auth/session-check sin token responde 401 AUTH_REQUIRED', async () => {
+      const response = await request(app.getHttpServer()).get('/api/auth/session-check').expect(401);
+
+      expect(response.body).toMatchObject({ ok: false, error: { code: 'AUTH_REQUIRED' } });
+    });
+
+    it('GET /api/auth/admin-check con un JWT inventado responde 401 AUTH_INVALID_TOKEN', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/auth/admin-check')
+        .set('Authorization', 'Bearer no.es.un.jwt')
+        .expect(401);
+
+      expect(response.body).toMatchObject({ ok: false, error: { code: 'AUTH_INVALID_TOKEN' } });
+    });
+
+    it('POST /api/auth/login con body inválido responde 400 VALIDATION_ERROR', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send({ email: 'no-es-correo', password: '' })
+        .expect(400);
+
+      expect(response.body).toMatchObject({ ok: false, error: { code: 'VALIDATION_ERROR' } });
+    });
+
+    it('POST /api/auth/set-password rechaza contraseñas de menos de 10 caracteres', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/set-password')
+        .send({ token: 'a'.repeat(43), password: 'corta' })
+        .expect(400);
+
+      expect(response.body.error.code).toBe('VALIDATION_ERROR');
+    });
+  });
+
   describe('rate limit', () => {
     it('responde 429 con el envelope de error al superar el límite', async () => {
       const limitedApp = await createApp();

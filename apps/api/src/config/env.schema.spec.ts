@@ -2,10 +2,11 @@ import { validateEnv } from './env.schema';
 
 const BASE_ENV = {
   DATABASE_URL: 'postgresql://user:pass@127.0.0.1:5433/xrlab',
+  JWT_ACCESS_SECRET: 'x'.repeat(32),
 };
 
 describe('validateEnv', () => {
-  it('aplica valores por defecto cuando solo está DATABASE_URL', () => {
+  it('aplica valores por defecto con solo las variables obligatorias', () => {
     const env = validateEnv(BASE_ENV);
 
     expect(env).toMatchObject({
@@ -17,6 +18,10 @@ describe('validateEnv', () => {
       THROTTLE_LIMIT: 100,
     });
     expect(env.CORS_ORIGINS).toEqual(['http://127.0.0.1:4300', 'http://localhost:4300']);
+  });
+
+  it('exige un JWT_ACCESS_SECRET de al menos 32 caracteres', () => {
+    expect(() => validateEnv({ ...BASE_ENV, JWT_ACCESS_SECRET: 'corto' })).toThrow(/JWT_ACCESS_SECRET/);
   });
 
   it('lanza un error que menciona DATABASE_URL cuando falta', () => {
@@ -56,10 +61,17 @@ describe('validateEnv', () => {
       ...BASE_ENV,
       NODE_ENV: 'production',
       CORS_ORIGINS: 'https://xrlab.example.com',
+      RESEND_API_KEY: 're_test_key',
     });
 
     expect(env.NODE_ENV).toBe('production');
     expect(env.CORS_ORIGINS).toEqual(['https://xrlab.example.com']);
+  });
+
+  it('exige RESEND_API_KEY en producción', () => {
+    expect(() =>
+      validateEnv({ ...BASE_ENV, NODE_ENV: 'production', CORS_ORIGINS: 'https://xrlab.example.com' }),
+    ).toThrow(/RESEND_API_KEY/);
   });
 
   it('rechaza un NODE_ENV desconocido', () => {
