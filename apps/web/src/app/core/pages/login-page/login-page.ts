@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Eye, EyeOff, ShieldCheck } from 'lucide-angular';
+import { Eye, EyeOff } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import { Alert, Icon } from '../../../shared/ui';
 import type { UserRole } from '../../models/auth.models';
@@ -28,7 +28,7 @@ export class LoginPage {
 
   readonly auth = inject(AuthService);
 
-  readonly icons = { eye: Eye, eyeOff: EyeOff, shield: ShieldCheck };
+  readonly icons = { eye: Eye, eyeOff: EyeOff };
   readonly showDevUsers = !environment.production;
   readonly showPassword = signal(false);
   readonly isSubmitting = signal(false);

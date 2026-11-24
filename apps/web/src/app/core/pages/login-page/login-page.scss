@@ -104,30 +104,11 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--s-7);
+  justify-content: flex-end;
   overflow: hidden;
   padding: var(--s-7) clamp(1.5rem, 4vw, 4rem);
   background: var(--blue-900);
   color: #fff;
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: var(--s-3);
-    font-size: var(--fs-title);
-    letter-spacing: 0.01em;
-  }
-
-  .mark {
-    display: grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: var(--r-control);
-    background: var(--yellow-500);
-    color: var(--blue-900);
-  }
 
   .copy {
     position: relative;

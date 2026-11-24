@@ -36,6 +36,17 @@ Swiss Modernism sobrio: rejilla clara, jerarquía por tamaño y peso, bordes fin
 | Mono para etiquetas, `→` en botones, `A · B · C` | Prohibido |
 | Párrafo `lead` explicando la tecnología | Prohibido. Se explica qué hacer, no cómo está construido |
 
+### Pantalla de referencia: el login (acordada con el cliente)
+
+El login fija el lenguaje visual que siguen las demás fases. Es moderno, con contraste marcado y sin cajas innecesarias.
+
+- **Composición dividida 60/40.** Zona de trabajo a la izquierda sobre `--paper`, **sin tarjeta contenedora**. Panel de mensaje a la derecha en `--blue-900`, con un titular grande y un texto corto.
+- **Controles grandes y generosos:** campos y botón de 60 px de alto, texto de 19 px, radio 10.
+- **Un motivo gráfico por pantalla, nunca más:** los anillos concéntricos con el arco amarillo (eco del anillo del QR). Es decorativo, estático y con `aria-hidden`.
+- **Sin logotipo ni marca repetida** dentro del panel.
+- **Móvil:** el panel pasa arriba como banda compacta (solo titular); el contenido va debajo.
+- Aplicación a las demás fases: el kiosko usa el panel oscuro y los anillos como protagonista; el estudiante abre con una banda oscura corta y el contenido sobre `--paper`; en admin el panel oscuro vive en la sidebar y las zonas de trabajo no llevan tarjeta si una línea o un espacio bastan.
+
 ## 3. Color
 
 | Token | Hex | Uso |
