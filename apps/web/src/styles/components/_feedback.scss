@@ -1,0 +1,165 @@
+// Badge, alerta, estado vacío y esqueleto de carga.
+
+// ---- Badge de estado: ícono + texto, nunca solo color ----
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-height: 1.75rem;
+  padding: 0.125rem var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--blue-100);
+  color: var(--blue-700);
+  font-size: var(--fs-caption);
+  font-weight: 650;
+  white-space: nowrap;
+
+  svg {
+    flex: none;
+  }
+
+  // "Vivo": la única vez que el amarillo marca estado.
+  &.live {
+    background: var(--yellow-100);
+    color: var(--blue-900);
+    box-shadow: inset 0 0 0 1px var(--yellow-500);
+  }
+
+  &.ok {
+    background: var(--ok-bg);
+    color: var(--ok-fg);
+  }
+
+  &.warn,
+  &.secondary,
+  &.badge-warn {
+    background: var(--warn-bg);
+    color: var(--warn-fg);
+  }
+
+  &.err {
+    background: var(--err-bg);
+    color: var(--err-fg);
+  }
+
+  &.neutral {
+    background: var(--paper);
+    color: var(--ink-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+}
+
+.badge-warn {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+// ---- Alerta ----
+.alert,
+.error-box,
+.success-box,
+.warning-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-panel);
+  border: 1px solid var(--line);
+  background: var(--info-bg);
+  color: var(--ink);
+  font-size: var(--fs-label);
+
+  > svg {
+    flex: none;
+    margin-top: 0.1rem;
+  }
+
+  .alert-title {
+    display: block;
+    font-weight: 650;
+  }
+
+  .alert-body {
+    display: block;
+    color: var(--ink-2);
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &.ok,
+  &.success-box {
+    background: var(--ok-bg);
+    border-color: color-mix(in srgb, var(--ok-fg) 28%, transparent);
+    color: var(--ok-fg);
+  }
+
+  &.warn,
+  &.warning-box {
+    background: var(--warn-bg);
+    border-color: color-mix(in srgb, var(--warn-fg) 28%, transparent);
+    color: var(--warn-fg);
+  }
+
+  &.err,
+  &.error-box {
+    background: var(--err-bg);
+    border-color: color-mix(in srgb, var(--err-fg) 28%, transparent);
+    color: var(--err-fg);
+  }
+}
+
+// Las alertas "heredadas" (sin ícono) mantienen peso de texto semibold.
+.error-box,
+.success-box,
+.warning-box {
+  font-weight: 600;
+}
+
+// ---- Estado vacío ----
+.empty-state {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-2);
+  max-width: 46ch;
+  padding: var(--s-6) var(--s-4);
+
+  > svg {
+    color: var(--ink-3);
+  }
+
+  h2,
+  h3 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .actions {
+    margin-top: var(--s-3);
+  }
+}
+
+// ---- Esqueleto de carga ----
+.skeleton {
+  display: block;
+  min-height: 1rem;
+  border-radius: var(--r-control);
+  background: linear-gradient(90deg, var(--line) 25%, #eaeff3 50%, var(--line) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1.4s linear infinite;
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}

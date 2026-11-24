@@ -1,4 +1,5 @@
-<div class="app-shell">
+<div class="app-shell" [class.bare]="isLogin()">
+  @if (!isLogin()) {
   <header class="topbar">
     <a class="brand" routerLink="/login" aria-label="Ir al inicio">
       <span class="brand-mark" aria-hidden="true">
@@ -35,6 +36,7 @@
       }
     </nav>
   </header>
+  }
 
   <main class="main-content">
     <router-outlet />

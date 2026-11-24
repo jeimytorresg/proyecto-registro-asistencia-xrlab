@@ -1,0 +1,98 @@
+// Botón. Una sola acción primaria (amarilla) por vista.
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding: 0.5rem var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  background: var(--yellow-500);
+  color: var(--blue-900);
+  font-weight: 650;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+
+  &:hover:not(:disabled) {
+    background: #f0b000;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  // Secundario: borde azul
+  &.secondary {
+    background: var(--surface);
+    border-color: var(--blue-700);
+    color: var(--blue-700);
+
+    &:hover:not(:disabled) {
+      background: var(--blue-100);
+    }
+  }
+
+  // Texto
+  &.ghost {
+    background: transparent;
+    color: var(--blue-700);
+
+    &:hover:not(:disabled) {
+      background: var(--blue-100);
+    }
+  }
+
+  // Destructivo
+  &.danger {
+    background: var(--err-fg);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background: #912018;
+    }
+  }
+
+  &.block {
+    width: 100%;
+  }
+
+  &.sm {
+    min-height: 36px;
+    padding: 0.25rem var(--s-3);
+    font-size: var(--fs-label);
+  }
+
+  &.icon-only {
+    width: var(--tap);
+    padding: 0;
+  }
+
+  &[aria-busy='true'] {
+    cursor: progress;
+  }
+}
+
+.link-button {
+  min-height: var(--tap);
+  padding: 0 var(--s-2);
+  border: 0;
+  background: transparent;
+  color: var(--blue-700);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  border-radius: var(--r-control);
+}

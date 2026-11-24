@@ -1,0 +1,146 @@
+// Panel y tabla.
+
+// Panel: borde fino, sin sombra. `.card` se mantiene como alias hasta migrar las pantallas.
+.panel,
+.card {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+
+.panel-header,
+.table-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+
+  h2,
+  h3 {
+    margin: 0;
+  }
+}
+
+// Tabla. En escritorio es tabla; bajo 640px cada fila pasa a bloque
+// (requiere data-label en cada <td> para mostrar el nombre de la columna).
+.table-wrap,
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+}
+
+.table,
+.data-table,
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  // Cifras tabulares solo en celdas numéricas (.num): esta fuente ensancha
+  // puntos y dos puntos en modo tabular, lo que deforma correos y textos.
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  th,
+  td {
+    padding: var(--s-3) var(--s-4);
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    color: var(--ink-2);
+    font-size: var(--fs-label);
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  tbody tr:hover {
+    background: color-mix(in srgb, var(--blue-100) 45%, transparent);
+  }
+
+  td small {
+    display: block;
+    margin-top: 0.125rem;
+  }
+}
+
+// Las tablas aún sin data-label conservan scroll interno (migran en la Fase 6).
+.data-table {
+  min-width: 720px;
+}
+
+.admin-table {
+  min-width: 640px;
+}
+
+@media (max-width: 640px) {
+  .table-wrap:has(.table),
+  .table-scroll:has(.table) {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .table {
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    &,
+    tbody,
+    tr,
+    td {
+      display: block;
+      width: 100%;
+    }
+
+    tr {
+      margin-bottom: var(--s-3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-panel);
+      background: var(--surface);
+    }
+
+    td {
+      display: grid;
+      grid-template-columns: minmax(6.5rem, 38%) 1fr;
+      gap: var(--s-3);
+      border-bottom: 1px solid var(--line);
+
+      &::before {
+        content: attr(data-label);
+        color: var(--ink-3);
+        font-size: var(--fs-caption);
+        font-weight: 600;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      small {
+        grid-column: 2;
+        margin-top: calc(var(--s-3) * -0.75);
+      }
+    }
+  }
+}

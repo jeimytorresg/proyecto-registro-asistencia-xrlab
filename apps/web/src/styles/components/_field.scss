@@ -1,0 +1,98 @@
+// Campo de formulario: etiqueta siempre visible, ayuda y error debajo.
+.form-grid {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--s-1);
+
+  label,
+  .field-label {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: var(--tap);
+    padding: 0.55rem var(--s-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-control);
+    background: var(--surface);
+    color: var(--ink);
+    transition: border-color var(--dur-fast) var(--ease-out);
+
+    &::placeholder {
+      color: var(--ink-3);
+      opacity: 0.8;
+    }
+
+    &:hover {
+      border-color: var(--ink-3);
+    }
+
+    &:focus {
+      border-color: var(--blue-700);
+      box-shadow: var(--focus);
+      outline: none;
+    }
+
+    &[aria-invalid='true'],
+    &.ng-invalid.ng-touched {
+      border-color: var(--err-fg);
+    }
+
+    &:disabled {
+      background: var(--paper);
+      color: var(--ink-3);
+      cursor: not-allowed;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: var(--lh-body);
+  }
+
+  .hint {
+    font-size: var(--fs-caption);
+    color: var(--ink-3);
+  }
+
+  .error {
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--err-fg);
+  }
+}
+
+.form-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4);
+  align-items: end;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--s-4);
+  align-items: end;
+}
+
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+
+@media (max-width: 640px) {
+  .form-two {
+    grid-template-columns: 1fr;
+  }
+}

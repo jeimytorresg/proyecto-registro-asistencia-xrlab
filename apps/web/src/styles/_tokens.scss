@@ -1,0 +1,95 @@
+// Tokens XRLAB. Espejo de design-system/xrlab/tokens.css (fuente de verdad).
+:root {
+  // Marca
+  --blue-900: #0a2540;
+  --blue-700: #004270;
+  --blue-100: #e3edf5;
+  --yellow-500: #febe10;
+  --yellow-100: #fff4cf;
+
+  // Superficies y texto
+  --paper: #f6f8fa;
+  --surface: #ffffff;
+  --line: #d9e1e8;
+  --line-strong: #b9c5d0;
+  --ink: #0a2540;
+  --ink-2: #3b4d5e;
+  --ink-3: #566677;
+
+  // Estado
+  --ok-fg: #067647;
+  --ok-bg: #e8f6ee;
+  --warn-fg: #93370d;
+  --warn-bg: #fff4d6;
+  --err-fg: #b42318;
+  --err-bg: #fdecea;
+  --info-fg: #004270;
+  --info-bg: #e3edf5;
+
+  // Tipografía
+  --font: 'Schibsted Grotesk Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-caption: 0.8125rem;
+  --fs-label: 0.875rem;
+  --fs-body: 1rem;
+  --fs-title: 1.25rem;
+  --fs-headline: 1.75rem;
+  --fs-display: clamp(2.25rem, 5vw, 3rem);
+  --fs-kiosk: clamp(3rem, 8vw, 6rem);
+  --lh-tight: 1.15;
+  --lh-body: 1.55;
+
+  // Espaciado (base 4px)
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4.5rem;
+
+  // Radios por jerarquía
+  --r-control: 8px;
+  --r-panel: 12px;
+  --r-sheet: 20px;
+  --r-pill: 999px;
+
+  --shadow-float: 0 8px 28px rgb(10 37 64 / 0.16);
+
+  // Interacción
+  --tap: 44px;
+  --focus: 0 0 0 2px var(--surface), 0 0 0 4px var(--blue-700);
+
+  // Movimiento
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-sheet: 280ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  // Layout
+  --sidebar-w: 248px;
+  --content-max: 1200px;
+  --bottom-nav-h: 64px;
+
+  // Alias heredados: las pantallas aún no migradas los usan.
+  // Se eliminan en las fases 2 a 6, cuando cada pantalla pase a los tokens nuevos.
+  --utpl-blue: var(--blue-700);
+  --utpl-yellow: var(--yellow-500);
+  --bg-light: var(--paper);
+  --text: var(--ink);
+  --muted: var(--ink-3);
+  --border: var(--line);
+  --danger: var(--err-fg);
+  --success: var(--ok-fg);
+  --warning: var(--warn-fg);
+  --shadow-sm: none;
+  --shadow-md: var(--shadow-float);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-sheet: 0ms;
+  }
+}

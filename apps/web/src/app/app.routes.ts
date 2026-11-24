@@ -1,3 +1,4 @@
+import { isDevMode } from '@angular/core';
 import { Routes } from '@angular/router';
 import { roleGuard } from './core/guards/role.guard';
 
@@ -60,6 +61,14 @@ export const routes: Routes = [
       },
     ],
   },
+  ...(isDevMode()
+    ? [
+        {
+          path: 'ui-kit',
+          loadComponent: () => import('./shared/pages/ui-kit/ui-kit').then((m) => m.UiKit),
+        },
+      ]
+    : []),
   {
     path: 'error',
     loadComponent: () => import('./shared/pages/error-page/error-page').then((m) => m.ErrorPage),

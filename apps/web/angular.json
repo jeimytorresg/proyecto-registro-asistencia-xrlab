@@ -30,6 +30,7 @@
               }
             ],
             "styles": [
+              "node_modules/@fontsource-variable/schibsted-grotesk/index.css",
               "src/styles.scss"
             ]
           },

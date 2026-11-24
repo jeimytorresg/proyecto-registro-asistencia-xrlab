@@ -1,6 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Eye, EyeOff, ShieldCheck } from 'lucide-angular';
+import { environment } from '../../../../environments/environment';
+import { Alert, Icon } from '../../../shared/ui';
 import type { UserRole } from '../../models/auth.models';
 import { AuthService } from '../../services/auth.service';
 
@@ -12,91 +16,9 @@ interface DemoCredential {
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule],
-  template: `
-    <section class="placeholder-layout">
-      <article class="card hero-card">
-        <p class="eyebrow">PC1 · Autenticación y roles</p>
-        <h1>Inicio de sesión XRLAB</h1>
-        <p class="lead">
-          Acceso con Firebase Authentication, perfil extendido en PostgreSQL y
-          validación de rol en backend antes de entrar a rutas protegidas.
-        </p>
-
-        <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
-          <div class="field">
-            <label for="email">Correo institucional</label>
-            <input
-              id="email"
-              type="email"
-              formControlName="email"
-              autocomplete="email"
-              placeholder="usuario@xrlab.test"
-            />
-          </div>
-
-          <div class="field">
-            <label for="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              formControlName="password"
-              autocomplete="current-password"
-              placeholder="Ingrese su contraseña"
-            />
-          </div>
-
-          @if (error(); as currentError) {
-            <div class="error-box" role="alert">
-              {{ currentError }}
-            </div>
-          }
-
-          @if (auth.state().status === 'authenticated') {
-            <div class="success-box">
-              Sesión validada correctamente.
-            </div>
-          }
-
-          <div class="actions">
-            <button class="btn" type="submit" [disabled]="isSubmitting()">
-              {{ isSubmitting() ? 'Validando...' : 'Ingresar' }}
-            </button>
-          </div>
-        </form>
-      </article>
-
-      <aside class="card">
-        <h2>Usuarios de desarrollo</h2>
-        <p class="lead">
-          Estos usuarios existen solo en Firebase Auth Emulator.
-        </p>
-
-        <div class="demo-credentials">
-          @for (credential of demoCredentials; track credential.email) {
-            <div class="demo-credential">
-              <span>
-                <strong>{{ credential.label }}</strong>
-                <small>{{ credential.email }}</small>
-              </span>
-
-              <button
-                class="link-button"
-                type="button"
-                (click)="useDemoCredential(credential)"
-              >
-                Usar
-              </button>
-            </div>
-          }
-        </div>
-
-        <p class="warning-box" style="margin-top: 1rem;">
-          Clave común: Xrlab.Dev.2026!
-        </p>
-      </aside>
-    </section>
-  `,
+  imports: [ReactiveFormsModule, Alert, Icon],
+  templateUrl: './login-page.html',
+  styleUrl: './login-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPage {
@@ -106,6 +28,9 @@ export class LoginPage {
 
   readonly auth = inject(AuthService);
 
+  readonly icons = { eye: Eye, eyeOff: EyeOff, shield: ShieldCheck };
+  readonly showDevUsers = !environment.production;
+  readonly showPassword = signal(false);
   readonly isSubmitting = signal(false);
   readonly error = signal<string | null>(null);
 
@@ -132,6 +57,26 @@ export class LoginPage {
     password: ['', [Validators.required]],
   });
 
+  // Se recalcula cuando cambia el valor, el estado o "tocado" de cualquier campo.
+  private readonly formEvents = toSignal(this.form.events, { initialValue: null });
+
+  readonly emailError = computed(() => {
+    this.formEvents();
+    const control = this.form.controls.email;
+    if (!control.touched || control.valid) {
+      return null;
+    }
+    return control.hasError('required')
+      ? 'Escribe tu correo institucional.'
+      : 'Revisa el formato del correo: nombre@dominio.com';
+  });
+
+  readonly passwordError = computed(() => {
+    this.formEvents();
+    const control = this.form.controls.password;
+    return control.touched && control.invalid ? 'Escribe tu contraseña.' : null;
+  });
+
   useDemoCredential(credential: DemoCredential): void {
     this.form.setValue({
       email: credential.email,
@@ -142,7 +87,12 @@ export class LoginPage {
   }
 
   async submit(): Promise<void> {
-    if (this.form.invalid || this.isSubmitting()) {
+    if (this.isSubmitting()) {
+      return;
+    }
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 

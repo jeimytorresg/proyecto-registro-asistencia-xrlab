@@ -1,0 +1,82 @@
+/* XRLAB design tokens: fuente única de verdad. Solo modo claro. */
+:root {
+  /* Marca (institucional UTPL) */
+  --blue-900: #0a2540; /* tinta: texto principal, kiosko */
+  --blue-700: #004270; /* marca: acciones primarias, nav activa */
+  --blue-100: #e3edf5; /* fondo de selección / hover suave */
+  --yellow-500: #febe10; /* SEÑAL: solo lo "vivo" (QR activo, dentro del lab, CTA principal) */
+  --yellow-100: #fff4cf;
+
+  /* Superficies y texto */
+  --paper: #f6f8fa;
+  --surface: #ffffff;
+  --line: #d9e1e8;
+  --line-strong: #b9c5d0;
+  --ink: #0a2540;
+  --ink-2: #3b4d5e; /* texto secundario, 8.2:1 sobre --paper */
+  --ink-3: #566677; /* ayudas y metadatos, 5.6:1 sobre --paper */
+
+  /* Estado (siempre ícono + texto, nunca solo color) */
+  --ok-fg: #067647;
+  --ok-bg: #e8f6ee;
+  --warn-fg: #93370d;
+  --warn-bg: #fff4d6;
+  --err-fg: #b42318;
+  --err-bg: #fdecea;
+  --info-fg: #004270;
+  --info-bg: #e3edf5;
+
+  /* Tipografía: una familia, cifras tabulares en datos */
+  --font: 'Schibsted Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-caption: 0.8125rem; /* 13 */
+  --fs-label: 0.875rem; /* 14 */
+  --fs-body: 1rem; /* 16 */
+  --fs-title: 1.25rem; /* 20 */
+  --fs-headline: 1.75rem; /* 28 */
+  --fs-display: clamp(2.25rem, 5vw, 3rem); /* 36-48 */
+  --fs-kiosk: clamp(3rem, 8vw, 6rem); /* solo kiosko */
+  --lh-tight: 1.15;
+  --lh-body: 1.55;
+
+  /* Espaciado base 4px */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4.5rem;
+
+  /* Radios por jerarquía (no uno para todo) */
+  --r-control: 8px; /* botones, inputs */
+  --r-panel: 12px; /* paneles, tablas */
+  --r-sheet: 20px; /* hojas inferiores, visor de cámara */
+  --r-pill: 999px; /* solo badges y chips */
+
+  /* Elevación: bordes por defecto, sombra solo en lo flotante */
+  --shadow-float: 0 8px 28px rgb(10 37 64 / 0.16);
+
+  /* Interacción */
+  --tap: 44px; /* área táctil mínima */
+  --focus: 0 0 0 3px #fff, 0 0 0 5px var(--blue-700);
+
+  /* Movimiento */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-sheet: 280ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layout */
+  --sidebar-w: 248px;
+  --content-max: 1200px;
+  --bottom-nav-h: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-sheet: 0ms;
+  }
+}

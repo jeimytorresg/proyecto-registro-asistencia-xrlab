@@ -1,0 +1,214 @@
+:host {
+  display: block;
+}
+
+.login {
+  display: grid;
+  grid-template-columns: 3fr 2fr; // 60 / 40
+  min-height: 100dvh;
+}
+
+// ---- 60%: formulario sobre el fondo de la página, sin tarjeta ----
+.form-side {
+  display: grid;
+  align-content: center;
+  padding: var(--s-7) clamp(1.5rem, 6vw, 5.5rem);
+}
+
+.login-form {
+  display: grid;
+  gap: var(--s-5);
+  width: min(100%, 35rem);
+  margin-inline: auto;
+
+  h1 {
+    margin: 0;
+    font-size: var(--fs-display);
+  }
+
+  .intro {
+    margin: calc(var(--s-3) * -1) 0 0;
+    color: var(--ink-2);
+    font-size: 1.125rem;
+  }
+
+  // Campos grandes
+  .field {
+    gap: var(--s-2);
+
+    label {
+      font-size: var(--fs-body);
+    }
+
+    input {
+      min-height: 3.75rem;
+      padding: 0.75rem var(--s-4);
+      font-size: 1.1875rem;
+      border-radius: 10px;
+    }
+
+    .error {
+      font-size: var(--fs-label);
+    }
+  }
+
+  .password {
+    position: relative;
+
+    input {
+      padding-right: 3.5rem;
+    }
+  }
+
+  .toggle {
+    position: absolute;
+    top: 50%;
+    right: var(--s-1);
+    display: grid;
+    place-items: center;
+    width: var(--tap);
+    height: var(--tap);
+    border: 0;
+    border-radius: var(--r-control);
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    transform: translateY(-50%);
+
+    &:hover {
+      color: var(--blue-700);
+      background: var(--blue-100);
+    }
+  }
+
+  .submit {
+    min-height: 3.75rem;
+    font-size: 1.1875rem;
+    border-radius: 10px;
+  }
+}
+
+.dev-users {
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+
+  p {
+    margin-bottom: var(--s-2);
+    color: var(--ink-3);
+    font-size: var(--fs-caption);
+  }
+}
+
+// ---- 40%: bienvenida ----
+.welcome {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--s-7);
+  overflow: hidden;
+  padding: var(--s-7) clamp(1.5rem, 4vw, 4rem);
+  background: var(--blue-900);
+  color: #fff;
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: var(--fs-title);
+    letter-spacing: 0.01em;
+  }
+
+  .mark {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--r-control);
+    background: var(--yellow-500);
+    color: var(--blue-900);
+  }
+
+  .copy {
+    position: relative;
+    z-index: 1;
+    max-width: 24rem;
+
+    h2 {
+      margin-bottom: var(--s-3);
+      color: #fff;
+      font-size: clamp(2rem, 3.4vw, 3rem);
+      line-height: 1.08;
+    }
+
+    p {
+      margin: 0;
+      color: #c9d6e2;
+      font-size: 1.125rem;
+    }
+  }
+
+  // Anillos: eco del código QR rotatorio del kiosko. Decorativos y estáticos.
+  .rings {
+    position: absolute;
+    top: -16%;
+    right: -26%;
+    width: min(90%, 32rem);
+    fill: none;
+    stroke: #fff;
+    stroke-opacity: 0.14;
+    stroke-width: 1.5;
+    pointer-events: none;
+
+    .arc {
+      stroke: var(--yellow-500);
+      stroke-opacity: 1;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 28 72;
+      transform: rotate(120deg);
+      transform-origin: 200px 200px;
+    }
+
+    .dot {
+      fill: var(--yellow-500);
+      stroke: none;
+    }
+  }
+}
+
+// ---- Tablet y móvil: la bienvenida pasa arriba, compacta ----
+@media (max-width: 860px) {
+  .login {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .welcome {
+    order: -1;
+    gap: var(--s-4);
+    padding: var(--s-5) var(--s-5) var(--s-6);
+
+    .copy p,
+    .rings {
+      display: none;
+    }
+
+    .copy h2 {
+      margin: 0;
+      font-size: var(--fs-headline);
+    }
+  }
+
+  .form-side {
+    padding: var(--s-6) var(--s-5) var(--s-7);
+  }
+
+  .login-form {
+    margin-inline: 0;
+
+    h1 {
+      font-size: var(--fs-headline);
+    }
+  }
+}

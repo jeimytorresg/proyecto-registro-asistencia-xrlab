@@ -12,6 +12,12 @@
       "sourceType": "github",
       "skillPath": "skills/neon-postgres/SKILL.md",
       "computedHash": "959eeb3e8f62ed27d2124633848e52c12f49f3555fd1f6cfe90ef5effdcc1e2b"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "8e86f94541dd7a5548bb79cb5f8edb914bf50c832842c95470eecefb462d9b75"
     }
   }
 }
