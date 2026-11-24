@@ -1,0 +1,23 @@
+# Postgres local para desarrollo y tests. En producción se usa Neon.
+# Uso: npm run db:up   ->   DATABASE_URL=postgresql://xrlab:xrlab_dev@127.0.0.1:5433/xrlab
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: xrlab-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: xrlab
+      POSTGRES_PASSWORD: xrlab_dev
+      POSTGRES_DB: xrlab
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - xrlab-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xrlab -d xrlab"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  xrlab-pgdata:

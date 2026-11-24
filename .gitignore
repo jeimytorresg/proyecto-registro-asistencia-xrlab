@@ -19,6 +19,12 @@ functions/.secret.local
 database/node_modules/
 database/.env
 
+# API (NestJS)
+apps/api/node_modules/
+apps/api/dist/
+apps/api/coverage/
+apps/api/*.tsbuildinfo
+
 # Local / OS
 .env
 .env.*
