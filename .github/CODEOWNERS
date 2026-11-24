@@ -1,0 +1,8 @@
+# Las zonas delicadas requieren la aprobación del responsable.
+# Solo bloquea el merge si en GitHub se activa "Require review from Code Owners" en la protección de la rama.
+/apps/api/src/auth/        @ericroco
+/apps/api/src/config/      @ericroco
+/apps/api/src/database/    @ericroco
+/apps/api/src/app.module.ts @ericroco
+/database/                 @ericroco
+/docs/juniors/             @ericroco

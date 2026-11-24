@@ -1,8 +1,25 @@
 # Migración de Firebase Functions a un backend NestJS
 
-Estado: **Fases 0 y 1 hechas** (rama `feat/migracion-nest`, sin commit). Siguiente: Fase 2. Ver "Para retomar".
+Estado: **Fases 0, 1 y 2 hechas y subidas** (rama `feat/migracion-nest`). Siguiente: Fase 3. Ver "Para retomar".
 
-## Para retomar (última actualización: 2026-11-21)
+## Actualización 2026-11-24
+
+- **Fase 2 hecha:** migración `database/migrations/0004_auth_propio.sql`, módulo `apps/api/src/auth`
+  (login, refresh rotativo con detección de reutilización, logout, set-password, forgot-password, session-check),
+  `JwtAuthGuard` con `@Auth(...roles)`, correo por la API HTTP de Resend, contraseñas con argon2id, zod 4.
+  77 tests pasando. **Decisiones tomadas por defecto** (se pueden cambiar): proveedor de correo Resend y
+  Fase 5 con la opción A (importar usuarios y que definan contraseña nueva).
+- **Sin verificar todavía:** la migración `0004` y los repositorios SQL no se han ejecutado contra un Postgres
+  real (Docker Desktop no estaba encendido). Es lo primero que hay que hacer: `npm run db:up`,
+  `npm run database:migrate:all`, y probar login/set-password de punta a punta.
+- **Fase 3 sin empezar** (kiosk, attendance, admin). Es la parte más grande: unas 3.000 líneas a portar.
+- **Trabajo para juniors:** ver [`docs/juniors/README.md`](./juniors/README.md). Son tareas que solo agregan
+  archivos nuevos (tests, README, Dockerfile, lógica pura del QR).
+- Los scripts `pcN-verify` todavía hacen login contra el emulador de Firebase; falta el helper de login propio.
+- Deuda de la Fase 2: tests e2e con JSON malformado y body de más de 300 kb, y revisión con `security-reviewer`
+  del módulo de auth (pendiente).
+
+## Para retomar (última actualización: 2026-11-21, anterior a la Fase 2)
 
 **Dónde está el trabajo:** rama `feat/migracion-nest` en
 `C:\Users\LENOVO\Desktop\Proyectos\colaboraciones\proyecto-registro-asistencia-xrlab`. **Nada está commiteado.**
