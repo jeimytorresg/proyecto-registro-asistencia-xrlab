@@ -19,7 +19,7 @@ import {
 import { filter } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { fmt } from '../../../shared/format';
-import { Icon } from '../../../shared/ui';
+import { Icon, Rings } from '../../../shared/ui';
 
 interface NavItem {
   path: string;
@@ -44,7 +44,7 @@ const QUICK_PATHS = ['/admin/dashboard', '/admin/attendance', '/admin/students']
 
 @Component({
   selector: 'app-admin-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, A11yModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, Rings, A11yModule],
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

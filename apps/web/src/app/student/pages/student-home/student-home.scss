@@ -1,0 +1,261 @@
+:host {
+  display: block;
+}
+
+// Misma composición que el login: zona de trabajo (60%) + panel oscuro (40%).
+.student {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  min-height: calc(100dvh - 3.75rem); // menos la cabecera mínima
+}
+
+.work {
+  display: grid;
+  align-content: start;
+  padding: var(--s-7) clamp(1.5rem, 6vw, 5rem);
+}
+
+.work-inner {
+  display: grid;
+  gap: var(--s-5);
+  width: min(100%, 34rem);
+  margin-inline: auto;
+
+  h1 {
+    margin: 0;
+    font-size: var(--fs-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+// ---- Cámara ----
+.camera {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3; // escritorio: horizontal. En móvil pasa a vertical.
+  overflow: hidden;
+  border-radius: var(--r-sheet);
+  background: var(--blue-900);
+
+  video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &:not(.on) video {
+    visibility: hidden;
+  }
+
+  .idle {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--s-5);
+    color: #c9d6e2;
+  }
+
+  // Visor: esquinas amarillas ("lo vivo": la cámara está leyendo).
+  .finder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--yellow-500);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+
+  .busy {
+    position: absolute;
+    inset: auto 0 0;
+    padding: var(--s-4);
+    background: rgb(10 37 64 / 0.85);
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+.stop {
+  justify-self: start;
+}
+
+// ---- Confirmar salida ----
+.entered {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 1.125rem;
+
+  strong {
+    color: var(--ink);
+  }
+}
+
+.stack .field textarea {
+  min-height: 9rem;
+  font-size: 1.0625rem;
+}
+
+.actions .btn:not(.ghost) {
+  min-width: 12rem;
+}
+
+.dev {
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line);
+  color: var(--ink-3);
+  font-size: var(--fs-label);
+
+  summary {
+    cursor: pointer;
+    margin-bottom: var(--s-3);
+  }
+}
+
+// ---- Panel de saludo ----
+.hello {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: calc(100dvh - 3.75rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding: var(--s-7) clamp(1.5rem, 4vw, 4rem);
+  background: var(--blue-900);
+  color: #fff;
+
+  .rings {
+    position: absolute;
+    top: -16%;
+    right: -26%;
+    width: min(90%, 32rem);
+  }
+
+  .copy {
+    position: relative;
+    z-index: 1;
+    max-width: 24rem;
+
+    h2 {
+      margin-bottom: var(--s-3);
+      color: #fff;
+      font-size: clamp(2rem, 3.4vw, 3rem);
+      line-height: 1.08;
+    }
+
+    p {
+      margin: 0;
+      color: #c9d6e2;
+      font-size: 1.125rem;
+    }
+  }
+}
+
+// ---- Resultado: hoja inferior que responde a la acción ----
+.sheet {
+  position: fixed;
+  z-index: 40;
+  inset: auto 40% 0 0; // escritorio: dentro de la columna de trabajo (60%)
+  display: flex;
+  gap: var(--s-4);
+  align-items: flex-start;
+  width: min(100%, 36rem);
+  margin-inline: auto;
+  padding: var(--s-5) var(--s-5) calc(var(--s-5) + env(safe-area-inset-bottom));
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  animation: sheet-in var(--dur-sheet) var(--ease-out);
+
+  h2 {
+    margin: 0 0 var(--s-1);
+    font-size: var(--fs-headline);
+  }
+
+  p {
+    margin: 0 0 var(--s-2);
+    color: var(--ink-2);
+    font-size: 1.125rem;
+  }
+
+  ul {
+    margin: 0 0 var(--s-2);
+    padding-left: 1.1rem;
+    color: var(--ink-2);
+  }
+
+  .badge-ok {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--ok-bg);
+    color: var(--ok-fg);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+// ---- Móvil: el saludo pasa arriba como banda ----
+@media (max-width: 860px) {
+  .student {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .hello {
+    position: relative;
+    order: -1;
+    height: auto;
+    padding: var(--s-5);
+
+    .rings {
+      display: none;
+    }
+
+    .copy h2 {
+      margin-bottom: var(--s-1);
+      font-size: var(--fs-headline);
+    }
+
+    .copy p {
+      font-size: 1rem;
+    }
+  }
+
+  .work {
+    padding: var(--s-5) var(--s-5) 8rem;
+  }
+
+  .sheet {
+    inset: auto 0 0 0;
+  }
+
+  .work-inner h1 {
+    font-size: var(--fs-headline);
+  }
+
+  .camera {
+    aspect-ratio: 3 / 4;
+    max-height: 68dvh;
+  }
+}

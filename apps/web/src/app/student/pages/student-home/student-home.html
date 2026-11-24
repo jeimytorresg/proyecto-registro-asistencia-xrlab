@@ -1,0 +1,136 @@
+<div class="student">
+  <main class="work">
+    <div class="work-inner">
+      <h1>{{ exitContext() ? 'Confirmar salida' : 'Escanear QR' }}</h1>
+
+      @if (error(); as currentError) {
+        <app-alert kind="err" title="No se pudo registrar">{{ currentError }}</app-alert>
+      }
+
+      @if (exitContext(); as pending) {
+        <form class="stack" [formGroup]="activityForm" (ngSubmit)="submitExit()" novalidate>
+          @if (fmt.time(pending.entryAt); as entryTime) {
+            <p class="entered">Entraste a las <strong>{{ entryTime }}</strong>.</p>
+          }
+
+          <div class="field">
+            <label for="activitiesText">Actividades realizadas</label>
+            <textarea
+              id="activitiesText"
+              rows="7"
+              formControlName="activitiesText"
+              placeholder="Configuración de visor XR&#10;Prueba de aplicación de realidad virtual&#10;Documentación de evidencia"
+              [attr.aria-invalid]="activitiesInvalid() ? 'true' : null"
+              [attr.aria-describedby]="activitiesInvalid() ? 'activities-error' : 'activities-hint'"
+            ></textarea>
+            @if (activitiesInvalid()) {
+              <span class="error" id="activities-error">Escribe al menos una actividad para registrar tu salida.</span>
+            } @else {
+              <span class="hint" id="activities-hint">Una actividad por línea.</span>
+            }
+          </div>
+
+          <div class="actions">
+            <button class="btn" type="submit" [disabled]="isSubmitting()" [attr.aria-busy]="isSubmitting()">
+              {{ isSubmitting() ? 'Registrando salida…' : 'Confirmar salida' }}
+            </button>
+            <button class="btn ghost" type="button" [disabled]="isSubmitting()" (click)="resetExitFlow()">
+              Escanear otro QR
+            </button>
+          </div>
+        </form>
+      } @else {
+        <div class="camera" [class.on]="cameraActive()">
+          <video #videoPreview muted playsinline aria-label="Vista de la cámara"></video>
+
+          @if (cameraActive()) {
+            <svg class="finder" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+              <path d="M16 34V20a4 4 0 0 1 4-4h14" />
+              <path d="M66 16h14a4 4 0 0 1 4 4v14" />
+              <path d="M84 66v14a4 4 0 0 1-4 4H66" />
+              <path d="M34 84H20a4 4 0 0 1-4-4V66" />
+            </svg>
+          } @else {
+            <div class="idle">
+              <app-icon [icon]="icons.camera" [size]="44" />
+              <button class="btn" type="button" [disabled]="isSubmitting()" (click)="startScanner()">
+                Activar cámara
+              </button>
+            </div>
+          }
+
+          @if (isSubmitting()) {
+            <div class="busy" role="status">Validando QR…</div>
+          }
+        </div>
+
+        @if (cameraActive()) {
+          <button class="btn ghost stop" type="button" (click)="stopScanner()">Detener cámara</button>
+        }
+      }
+
+      @if (showDevTools) {
+        <details class="dev">
+          <summary>Herramientas de desarrollo</summary>
+          <form class="stack" [formGroup]="manualForm" (ngSubmit)="submitManualToken()">
+            <div class="field">
+              <label for="manualQrToken">Token QR de prueba</label>
+              <textarea
+                id="manualQrToken"
+                rows="3"
+                formControlName="qrToken"
+                placeholder="Pega aquí el token copiado desde el kiosko"
+              ></textarea>
+            </div>
+            <button class="btn secondary sm" type="submit" [disabled]="isSubmitting()">Enviar token</button>
+          </form>
+        </details>
+      }
+    </div>
+  </main>
+
+  <aside class="hello">
+    <app-rings class="rings" [accent]="true" />
+    <div class="copy">
+      <h2>Hola, {{ firstName() }}</h2>
+      @if (exitContext()) {
+        <p>Cuéntanos qué hiciste para cerrar tu visita al laboratorio.</p>
+      } @else {
+        <p>Escanea el QR del kiosko para registrar tu entrada. Al terminar, vuelve a escanearlo para registrar tu salida.</p>
+      }
+    </div>
+  </aside>
+</div>
+
+@if (result(); as scan) {
+  @if (scan.action === 'ENTRY_REGISTERED') {
+    <div class="sheet" role="status">
+      <span class="badge-ok"><app-icon [icon]="icons.ok" [size]="32" /></span>
+      <div>
+        <h2>Entrada registrada</h2>
+        @if (fmt.time(scan.entryAt); as entryTime) {
+          <p>Quedó anotada a las {{ entryTime }}.</p>
+        }
+        <small>Cerrando tu sesión…</small>
+      </div>
+    </div>
+  }
+}
+
+@if (exitResult(); as done) {
+  <div class="sheet" role="status">
+    <span class="badge-ok"><app-icon [icon]="icons.ok" [size]="32" /></span>
+    <div>
+      <h2>Salida registrada</h2>
+      <p>Estuviste {{ fmt.duration(done.durationMinutes) }} en el laboratorio.</p>
+      @if (done.activities.length > 0) {
+        <ul>
+          @for (activity of done.activities; track activity) {
+            <li>{{ activity }}</li>
+          }
+        </ul>
+      }
+      <small>Cerrando tu sesión…</small>
+    </div>
+  </div>
+}

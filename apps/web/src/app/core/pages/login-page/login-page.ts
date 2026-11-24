@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Eye, EyeOff } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
-import { Alert, Icon } from '../../../shared/ui';
+import { Alert, Icon, Rings } from '../../../shared/ui';
 import type { UserRole } from '../../models/auth.models';
 import { AuthService } from '../../services/auth.service';
 
@@ -16,7 +16,7 @@ interface DemoCredential {
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, Alert, Icon],
+  imports: [ReactiveFormsModule, Alert, Icon, Rings],
   templateUrl: './login-page.html',
   styleUrl: './login-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

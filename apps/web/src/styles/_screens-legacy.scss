@@ -1,6 +1,6 @@
 // Estilos de pantallas AÚN NO rediseñadas, portados a los tokens nuevos y sin duplicados.
 // Cada bloque se elimina cuando su pantalla se migra (ver plan de fases):
-//   estudiante -> F4 | kiosko -> F5 (login y panel admin ya migrados)
+//   kiosko -> F5 (login, panel admin y estudiante ya migrados)
 
 .page-grid {
   display: grid;
@@ -25,8 +25,7 @@
   color: var(--ink-2);
 }
 
-.kiosk-layout,
-.student-scan-layout {
+.kiosk-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
   gap: var(--s-4);
@@ -76,8 +75,7 @@
   }
 }
 
-.qr-placeholder,
-.scanner-placeholder {
+.qr-placeholder {
   display: grid;
   place-items: center;
   color: var(--ink-3);
@@ -85,44 +83,8 @@
   text-align: center;
 }
 
-.scanner-frame {
-  position: relative;
-  overflow: hidden;
-  min-height: 360px;
-  border-radius: var(--r-sheet);
-  background: var(--blue-900);
-
-  video {
-    display: block;
-    width: 100%;
-    min-height: 360px;
-    object-fit: cover;
-  }
-}
-
-.scanner-placeholder {
-  position: absolute;
-  inset: 0;
-  background: rgb(10 37 64 / 0.86);
-  color: #fff;
-}
-
-.dev-token-form {
-  margin-top: var(--s-4);
-  padding-top: var(--s-4);
-  border-top: 1px solid var(--line);
-}
-
-.activity-exit-form {
-  padding: var(--s-4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-panel);
-  background: var(--paper);
-}
-
 @media (max-width: 860px) {
   .kiosk-layout,
-  .student-scan-layout,
   .kiosk-session-panel {
     grid-template-columns: 1fr;
   }
@@ -131,8 +93,4 @@
     min-height: 300px;
   }
 
-  .scanner-frame,
-  .scanner-frame video {
-    min-height: 300px;
-  }
 }

@@ -135,26 +135,6 @@
     top: -16%;
     right: -26%;
     width: min(90%, 32rem);
-    fill: none;
-    stroke: #fff;
-    stroke-opacity: 0.14;
-    stroke-width: 1.5;
-    pointer-events: none;
-
-    .arc {
-      stroke: var(--yellow-500);
-      stroke-opacity: 1;
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-dasharray: 28 72;
-      transform: rotate(120deg);
-      transform-origin: 200px 200px;
-    }
-
-    .dot {
-      fill: var(--yellow-500);
-      stroke: none;
-    }
   }
 }
 

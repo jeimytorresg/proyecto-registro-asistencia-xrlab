@@ -2,13 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  computed,
   OnDestroy,
   ViewChild,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BrowserCodeReader, BrowserQRCodeReader } from '@zxing/browser';
+import { Camera, CircleCheck } from 'lucide-angular';
 import { environment } from '../../../../environments/environment';
 import type {
   AttendanceExitResponse,
@@ -16,6 +19,8 @@ import type {
 } from '../../../core/models/attendance.models';
 import { AttendanceService } from '../../../core/services/attendance.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { fmt } from '../../../shared/format';
+import { Alert, Icon, Rings } from '../../../shared/ui';
 
 interface ExitContext {
   qrToken: string;
@@ -25,138 +30,19 @@ interface ExitContext {
 
 @Component({
   selector: 'app-student-home',
-  imports: [ReactiveFormsModule],
-  template: `
-    <section class="student-scan-layout">
-      <article class="card hero-card">
-        <p class="eyebrow">Estudiante · PC3</p>
-        <h1>Escanear QR del kiosko</h1>
-        <p class="lead">
-          Si no tiene entrada abierta, se registra entrada. Si ya tiene entrada abierta,
-          registre las actividades realizadas para confirmar la salida.
-        </p>
-
-        @if (auth.session(); as session) {
-          <div class="success-box">
-            Sesión estudiante: {{ session.profile.firstName }} {{ session.profile.lastName }}
-            · {{ session.email }}
-          </div>
-        }
-
-        @if (error(); as currentError) {
-          <div class="error-box" role="alert">
-            {{ currentError }}
-          </div>
-        }
-
-        @if (result(); as scanResult) {
-          <div [class]="scanResult.action === 'ENTRY_REGISTERED' ? 'success-box' : 'warning-box'">
-            <strong>{{ scanResult.action }}</strong>
-            <p>{{ scanResult.message }}</p>
-            <small>Registro: {{ scanResult.attendanceSessionId }}</small>
-          </div>
-        }
-
-        @if (exitResult(); as completedExit) {
-          <div class="success-box">
-            <strong>{{ completedExit.action }}</strong>
-            <p>{{ completedExit.message }}</p>
-            <p>Duración: {{ completedExit.durationMinutes }} minuto(s)</p>
-            <small>Salida: {{ completedExit.exitAt }}</small>
-          </div>
-        }
-
-        @if (exitContext(); as pendingExit) {
-          <form class="form-grid activity-exit-form" [formGroup]="activityForm" (ngSubmit)="submitExit()">
-            <h2>Registrar actividades realizadas</h2>
-            <p class="lead">
-              Escriba una actividad por línea. Este campo es obligatorio para confirmar la salida.
-            </p>
-
-            <div class="field">
-              <label for="activitiesText">Actividades</label>
-              <textarea
-                id="activitiesText"
-                rows="6"
-                formControlName="activitiesText"
-                placeholder="Ejemplo: Configuración de visor XR&#10;Prueba de aplicación de realidad virtual&#10;Documentación de evidencia"
-              ></textarea>
-            </div>
-
-            <div class="actions">
-              <button class="btn" type="submit" [disabled]="isSubmitting()">
-                {{ isSubmitting() ? 'Registrando salida...' : 'Confirmar salida' }}
-              </button>
-
-              <button class="btn secondary" type="button" [disabled]="isSubmitting()" (click)="resetExitFlow()">
-                Escanear otro QR
-              </button>
-            </div>
-
-            <small>
-              Entrada abierta: {{ pendingExit.entryAt ?? 'sin fecha visible' }}
-            </small>
-          </form>
-        } @else {
-          <div class="scanner-frame">
-            <video #videoPreview muted playsinline></video>
-
-            @if (!cameraActive()) {
-              <div class="scanner-placeholder">
-                Cámara detenida
-              </div>
-            }
-          </div>
-
-          <div class="actions">
-            <button class="btn" type="button" [disabled]="isSubmitting()" (click)="startScanner()">
-              Iniciar cámara
-            </button>
-
-            <button class="btn secondary" type="button" (click)="stopScanner()">
-              Detener cámara
-            </button>
-          </div>
-
-          @if (!environment.production) {
-            <form class="form-grid dev-token-form" [formGroup]="manualForm" (ngSubmit)="submitManualToken()">
-              <div class="field">
-                <label for="manualQrToken">Token QR para prueba local</label>
-                <textarea
-                  id="manualQrToken"
-                  rows="4"
-                  formControlName="qrToken"
-                  placeholder="Pegue aquí el token copiado desde el kiosko"
-                ></textarea>
-              </div>
-
-              <button class="btn secondary" type="submit" [disabled]="isSubmitting()">
-                Enviar token pegado
-              </button>
-            </form>
-          }
-        }
-      </article>
-
-      <aside class="card">
-        <h2>Estado del flujo</h2>
-        <ul class="status-list">
-          <li>Sin entrada abierta: se crea una sesión OPEN.</li>
-          <li>Con entrada abierta: se solicita actividades.</li>
-          <li>Salida sin actividades: bloqueada.</li>
-          <li>Salida exitosa: sesión pasa a COMPLETED.</li>
-          <li>Después de entrada o salida exitosa, se cierra la sesión móvil.</li>
-        </ul>
-      </aside>
-    </section>
-  `,
+  imports: [ReactiveFormsModule, Alert, Icon, Rings],
+  templateUrl: './student-home.html',
+  styleUrl: './student-home.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentHome implements OnDestroy {
   @ViewChild('videoPreview') private videoPreview?: ElementRef<HTMLVideoElement>;
 
   readonly auth = inject(AuthService);
-  readonly environment = environment;
+  readonly fmt = fmt;
+  readonly icons = { camera: Camera, ok: CircleCheck };
+  readonly showDevTools = !environment.production;
+  readonly firstName = computed(() => this.auth.session()?.profile.firstName ?? '');
 
   private readonly attendanceService = inject(AttendanceService);
   private readonly fb = inject(FormBuilder);
@@ -176,6 +62,16 @@ export class StudentHome implements OnDestroy {
   readonly activityForm = this.fb.nonNullable.group({
     activitiesText: ['', [Validators.required]],
   });
+
+  /** Error del campo de actividades: solo después de intentar enviar. */
+  readonly activitiesInvalid = signal(false);
+
+  constructor() {
+    // El aviso de campo vacío se quita en cuanto la persona empieza a escribir.
+    this.activityForm.controls.activitiesText.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.activitiesInvalid.set(false));
+  }
 
   private scannerControls: { stop: () => void } | null = null;
   private lastScannedToken = '';
@@ -197,13 +93,13 @@ export class StudentHome implements OnDestroy {
       const videoElement = this.videoPreview?.nativeElement;
 
       if (!videoElement) {
-        throw new Error('No se encontró el elemento de video para la cámara.');
+        throw new Error('No pudimos mostrar la cámara. Recarga la página e inténtalo de nuevo.');
       }
 
       const devices = await BrowserCodeReader.listVideoInputDevices();
 
       if (devices.length === 0) {
-        throw new Error('No se encontró una cámara disponible.');
+        throw new Error('No encontramos una cámara en este dispositivo.');
       }
 
       const preferredDevice =
@@ -239,7 +135,7 @@ export class StudentHome implements OnDestroy {
     const token = this.manualForm.controls.qrToken.value.trim();
 
     if (!token) {
-      this.error.set('Pegue un token QR para probar el flujo local.');
+      this.error.set('Pega un token QR para probar el flujo local.');
       return;
     }
 
@@ -259,9 +155,11 @@ export class StudentHome implements OnDestroy {
       .filter((activity) => activity.length > 0);
 
     if (activities.length === 0) {
-      this.error.set('Debe registrar al menos una actividad para confirmar la salida.');
+      this.activitiesInvalid.set(true);
       return;
     }
+
+    this.activitiesInvalid.set(false);
 
     this.isSubmitting.set(true);
     this.error.set(null);
@@ -288,6 +186,7 @@ export class StudentHome implements OnDestroy {
   }
 
   resetExitFlow(): void {
+    this.activitiesInvalid.set(false);
     this.exitContext.set(null);
     this.result.set(null);
     this.exitResult.set(null);
@@ -345,8 +244,10 @@ export class StudentHome implements OnDestroy {
   }
 
   private getErrorMessage(error: unknown): string {
-    return error instanceof Error
-      ? error.message
-      : 'No se pudo procesar el QR escaneado.';
+    if (error instanceof DOMException && error.name === 'NotAllowedError') {
+      return 'Permite el acceso a la cámara en tu navegador para escanear el QR.';
+    }
+
+    return error instanceof Error ? error.message : 'No se pudo procesar el QR escaneado. Inténtalo de nuevo.';
   }
 }

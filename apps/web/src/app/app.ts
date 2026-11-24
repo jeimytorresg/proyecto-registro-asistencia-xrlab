@@ -10,6 +10,11 @@ function isFullBleed(url: string): boolean {
   return url === '/' || url.startsWith('/login') || url.startsWith('/admin');
 }
 
+/** Rutas con cabecera mínima pero contenido de borde a borde. */
+function isEdgeToEdge(url: string): boolean {
+  return url.startsWith('/student');
+}
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, RouterLink],
@@ -21,13 +26,16 @@ export class App {
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
 
-  readonly fullBleed = toSignal(
+  private readonly url = toSignal(
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-      map((event) => isFullBleed(event.urlAfterRedirects)),
+      map((event) => event.urlAfterRedirects),
     ),
-    { initialValue: isFullBleed(location.pathname) },
+    { initialValue: location.pathname },
   );
+
+  readonly fullBleed = computed(() => isFullBleed(this.url()));
+  readonly edgeToEdge = computed(() => this.fullBleed() || isEdgeToEdge(this.url()));
 
   readonly name = computed(() => {
     const profile = this.auth.session()?.profile;
