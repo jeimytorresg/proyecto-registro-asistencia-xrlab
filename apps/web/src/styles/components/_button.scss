@@ -92,16 +92,3 @@
     cursor: progress;
   }
 }
-
-.link-button {
-  min-height: var(--tap);
-  padding: 0 var(--s-2);
-  border: 0;
-  background: transparent;
-  color: var(--blue-700);
-  font-weight: 650;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  cursor: pointer;
-  border-radius: var(--r-control);
-}

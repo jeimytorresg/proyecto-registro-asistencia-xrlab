@@ -46,6 +46,7 @@ El login fija el lenguaje visual que siguen las demás fases. Es moderno, con co
 - **Sin logotipo ni marca repetida** dentro del panel.
 - **Móvil:** el panel pasa arriba como banda compacta (solo titular); el contenido va debajo.
 - **Panel admin (acordado):** barra lateral oscura pegada a la izquierda (~27% del ancho, texto de 20 px) con nombre y rol del usuario (sin marca); en móvil, barra inferior con 3 accesos + "Más". Las páginas llevan solo el título, sin texto de apoyo ni tarjeta; las secciones se separan con un filete fuerte. Los KPIs usan una pieza destacada que ocupa 2 filas para que 5 piezas llenen la cuadrícula sin huecos.
+- **Kiosko (acordado):** pantalla completa en el azul oscuro, con los anillos centrados detrás del QR. El QR va centrado sobre una pieza blanca lo más grande que permita el alto, y un marco amarillo que se vacía durante la vida del QR actual (el único movimiento de la pantalla; con movimiento reducido queda fijo y el texto da los segundos). Título de una línea legible a distancia. Controles del operador pequeños en la esquina (flotan en escritorio y pasan debajo en pantallas angostas).
 - Aplicación a las demás fases: el kiosko usa el panel oscuro y los anillos como protagonista; el estudiante abre con una banda oscura corta y el contenido sobre `--paper`; en admin el panel oscuro vive en la sidebar y las zonas de trabajo no llevan tarjeta si una línea o un espacio bastan.
 
 ## 3. Color

@@ -71,19 +71,6 @@
   --content-max: 1200px;
   --bottom-nav-h: 64px;
 
-  // Alias heredados: las pantallas aún no migradas los usan.
-  // Se eliminan en las fases 2 a 6, cuando cada pantalla pase a los tokens nuevos.
-  --utpl-blue: var(--blue-700);
-  --utpl-yellow: var(--yellow-500);
-  --bg-light: var(--paper);
-  --text: var(--ink);
-  --muted: var(--ink-3);
-  --border: var(--line);
-  --danger: var(--err-fg);
-  --success: var(--ok-fg);
-  --warning: var(--warn-fg);
-  --shadow-sm: none;
-  --shadow-md: var(--shadow-float);
 }
 
 @media (prefers-reduced-motion: reduce) {

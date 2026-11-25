@@ -12,7 +12,7 @@ function isFullBleed(url: string): boolean {
 
 /** Rutas con cabecera mínima pero contenido de borde a borde. */
 function isEdgeToEdge(url: string): boolean {
-  return url.startsWith('/student');
+  return url.startsWith('/student') || url.startsWith('/kiosk');
 }
 
 @Component({

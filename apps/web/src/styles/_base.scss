@@ -147,3 +147,9 @@ small {
     transition-duration: 0.01ms !important;
   }
 }
+
+// La pantalla que carga el router crece hasta llenar el alto de la ventana.
+// Va en estilos globales: la encapsulación de app.scss no alcanza a los componentes del router.
+.app-shell .main-content > :not(router-outlet) {
+  flex: 1 0 auto;
+}

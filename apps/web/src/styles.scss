@@ -1,4 +1,4 @@
-// Punto de entrada de estilos globales. Orden: tokens -> base -> componentes -> pantallas heredadas.
+// Punto de entrada de estilos globales. Orden: tokens -> base -> componentes.
 @use 'styles/tokens';
 @use 'styles/base';
 @use 'styles/components/button';
@@ -6,4 +6,3 @@
 @use 'styles/components/feedback';
 @use 'styles/components/surface';
 @use 'styles/components/admin';
-@use 'styles/screens-legacy';

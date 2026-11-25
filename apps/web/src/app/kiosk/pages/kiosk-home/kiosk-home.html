@@ -1,0 +1,89 @@
+<div class="kiosk">
+  <app-rings class="rings" />
+
+  @if (!session()) {
+    <section class="idle">
+      <h1>Kiosko de asistencia</h1>
+      <p>Abre la sesión para mostrar el QR de entrada y salida.</p>
+
+      @if (error(); as currentError) {
+        <app-alert kind="err" title="No se pudo abrir el kiosko">{{ currentError }}</app-alert>
+      }
+      @if (statusMessage(); as message) {
+        <app-alert kind="info">{{ message }}</app-alert>
+      }
+
+      <button class="btn big" type="button" [disabled]="isBusy()" [attr.aria-busy]="isBusy()" (click)="openKiosk()">
+        {{ isBusy() ? 'Abriendo…' : 'Abrir sesión' }}
+      </button>
+    </section>
+  } @else {
+    <section class="live">
+      <h1>Escanea para registrar tu asistencia</h1>
+
+      <div class="stage">
+        @if (tokenWindow(); as window) {
+          @for (key of [window.jti]; track key) {
+            <svg class="countdown" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+              <rect class="track" x="1" y="1" width="98" height="98" rx="7" pathLength="100" />
+              <rect
+                class="drain"
+                x="1"
+                y="1"
+                width="98"
+                height="98"
+                rx="7"
+                pathLength="100"
+                [style.animation-duration.ms]="window.durationMs"
+                [style.animation-delay.ms]="-window.elapsedMs"
+              />
+            </svg>
+          }
+        }
+
+        <div class="tile">
+          @if (currentQrDataUrl(); as qrDataUrl) {
+            <img [src]="qrDataUrl" alt="Código QR temporal para registrar la asistencia" />
+          } @else {
+            <p class="renewing" role="status">{{ statusMessage() || 'Preparando el QR…' }}</p>
+          }
+        </div>
+      </div>
+
+      <p class="where">
+        <strong>{{ session()?.kiosk?.name }}</strong>
+        <span>{{ session()?.kiosk?.location }}</span>
+      </p>
+      <p class="renews" aria-live="off">
+        @if (secondsLeft() !== null) {
+          El QR se renueva en {{ secondsLeft() }} s
+        }
+      </p>
+
+      @if (error(); as currentError) {
+        <app-alert kind="err" title="Problema con el kiosko">{{ currentError }}</app-alert>
+      }
+    </section>
+
+    <div class="controls" role="group" aria-label="Controles del kiosko">
+      <button type="button" (click)="toggleFullscreen()">
+        <app-icon [icon]="isFullscreen() ? icons.minimize : icons.maximize" [size]="18" />
+        {{ isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa' }}
+      </button>
+      <button type="button" [disabled]="isBusy()" (click)="refreshBatch()">
+        <app-icon [icon]="icons.refresh" [size]="18" />
+        Renovar QR
+      </button>
+      @if (showDevTools && currentToken()) {
+        <button type="button" (click)="copyCurrentToken()">
+          <app-icon [icon]="icons.copy" [size]="18" />
+          Copiar token de prueba
+        </button>
+      }
+      <button class="close" type="button" [disabled]="isBusy()" (click)="closeKiosk()">
+        <app-icon [icon]="icons.power" [size]="18" />
+        Cerrar kiosko
+      </button>
+    </div>
+  }
+</div>

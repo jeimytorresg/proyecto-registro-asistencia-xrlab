@@ -1,4 +1,6 @@
 .app-shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
   background: var(--paper);
 }
@@ -49,6 +51,7 @@
     background: transparent;
     color: #fff;
     font-weight: 600;
+    white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
 
@@ -63,6 +66,9 @@
 }
 
 .main-content {
+  flex: 1; // las pantallas a pantalla completa ocupan el alto restante
+  display: flex;
+  flex-direction: column;
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
   padding: clamp(1.25rem, 4vw, 3rem) 0;

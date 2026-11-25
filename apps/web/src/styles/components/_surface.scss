@@ -1,17 +1,14 @@
 // Panel y tabla.
 
-// Panel con borde: solo para pantallas aún no migradas (estudiante, kiosko).
-// `.card` es alias heredado y se elimina cuando migren.
-.panel,
-.card {
+// Panel con borde (uso puntual; las pantallas del producto no llevan tarjetas).
+.panel {
   padding: clamp(1rem, 3vw, 1.5rem);
   border: 1px solid var(--line);
   border-radius: var(--r-panel);
   background: var(--surface);
 }
 
-.panel-header,
-.table-header {
+.panel-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -27,15 +24,12 @@
 
 // Tabla abierta: sin caja. La cabecera lleva una línea inferior y cada fila un filete.
 // Bajo 640px cada fila pasa a bloque (requiere data-label en cada <td>).
-.table-wrap,
-.table-scroll {
+.table-wrap {
   width: 100%;
   overflow-x: auto;
 }
 
-.table,
-.data-table,
-.admin-table {
+.table {
   width: 100%;
   border-collapse: collapse;
 
@@ -74,15 +68,6 @@
     flex-wrap: wrap;
     gap: var(--s-1) var(--s-2);
   }
-}
-
-// Tablas heredadas sin data-label conservan scroll interno hasta migrar.
-.data-table {
-  min-width: 720px;
-}
-
-.admin-table {
-  min-width: 640px;
 }
 
 @media (max-width: 640px) {

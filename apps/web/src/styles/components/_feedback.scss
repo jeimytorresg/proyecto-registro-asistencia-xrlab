@@ -30,9 +30,7 @@
     color: var(--ok-fg);
   }
 
-  &.warn,
-  &.secondary,
-  &.badge-warn {
+  &.warn {
     background: var(--warn-bg);
     color: var(--warn-fg);
   }
@@ -49,16 +47,8 @@
   }
 }
 
-.badge-warn {
-  background: var(--warn-bg);
-  color: var(--warn-fg);
-}
-
 // ---- Alerta ----
-.alert,
-.error-box,
-.success-box,
-.warning-box {
+.alert {
   display: flex;
   align-items: flex-start;
   gap: var(--s-3);
@@ -88,33 +78,23 @@
     }
   }
 
-  &.ok,
-  &.success-box {
+  &.ok {
     background: var(--ok-bg);
     border-color: color-mix(in srgb, var(--ok-fg) 28%, transparent);
     color: var(--ok-fg);
   }
 
-  &.warn,
-  &.warning-box {
+  &.warn {
     background: var(--warn-bg);
     border-color: color-mix(in srgb, var(--warn-fg) 28%, transparent);
     color: var(--warn-fg);
   }
 
-  &.err,
-  &.error-box {
+  &.err {
     background: var(--err-bg);
     border-color: color-mix(in srgb, var(--err-fg) 28%, transparent);
     color: var(--err-fg);
   }
-}
-
-// Las alertas "heredadas" (sin ícono) mantienen peso de texto semibold.
-.error-box,
-.success-box,
-.warning-box {
-  font-weight: 600;
 }
 
 // ---- Estado vacío ----

@@ -1,0 +1,237 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+// Toda la pantalla es el panel oscuro del sistema; el QR es lo único que brilla.
+.kiosk {
+  position: relative;
+  flex: 1; // ocupa el alto restante bajo la cabecera
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: var(--s-6) var(--s-5) 5rem;
+  background: var(--blue-900);
+  color: #fff;
+}
+
+// Anillos de fondo, centrados detrás del QR.
+.rings {
+  --rings-opacity: 0.09;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(120vmin, 60rem);
+  transform: translate(-50%, -50%);
+}
+
+.idle,
+.live {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: var(--s-4);
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+}
+
+.idle {
+  max-width: 32rem;
+
+  h1 {
+    font-size: var(--fs-display);
+  }
+
+  p {
+    margin: 0;
+    color: #c9d6e2;
+    font-size: 1.25rem;
+  }
+
+  .btn.big {
+    min-height: 4rem;
+    margin-top: var(--s-3);
+    padding-inline: var(--s-7);
+    font-size: 1.25rem;
+    border-radius: 10px;
+  }
+}
+
+.live {
+  // El QR ocupa el alto sobrante tras el título, los textos y los controles.
+  --qr: max(15rem, min(calc(100dvh - 25rem), 88vw, 46rem));
+
+  h1 {
+    max-width: 40ch;
+    font-size: clamp(1.75rem, 3.4vw, 3rem);
+    line-height: 1.1;
+  }
+}
+
+// ---- QR y cuenta regresiva ----
+.stage {
+  position: relative;
+  width: var(--qr);
+  height: var(--qr);
+  margin-block: var(--s-3);
+}
+
+.tile {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--s-3);
+  border-radius: var(--r-sheet);
+  background: #fff;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  .renewing {
+    margin: 0;
+    padding: var(--s-4);
+    color: var(--ink-2);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+// El marco amarillo se vacía en el tiempo que dura el QR actual: es lo único que se mueve.
+.countdown {
+  position: absolute;
+  inset: -0.9rem;
+  max-width: none; // la regla base limita svg al 100% y lo desalinea
+  width: calc(100% + 1.8rem);
+  height: calc(100% + 1.8rem);
+  fill: none;
+  stroke-linecap: round;
+  pointer-events: none;
+
+  .track {
+    stroke: #fff;
+    stroke-opacity: 0.16;
+    stroke-width: 1.4;
+  }
+
+  .drain {
+    stroke: var(--yellow-500);
+    stroke-width: 1.8;
+    stroke-dasharray: 100;
+    animation: drain linear forwards;
+  }
+}
+
+@keyframes drain {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+// Con movimiento reducido el marco queda completo; el texto indica los segundos.
+@media (prefers-reduced-motion: reduce) {
+  .countdown .drain {
+    animation: none !important;
+  }
+}
+
+.where {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-1) var(--s-4);
+  margin: 0;
+  font-size: 1.375rem;
+
+  strong {
+    font-weight: 650;
+  }
+
+  span {
+    color: #c9d6e2;
+  }
+}
+
+.renews {
+  min-height: 1.5rem;
+  margin: 0;
+  color: #c9d6e2;
+  font-size: var(--fs-body);
+}
+
+// ---- Controles del operador: discretos, en la esquina ----
+.controls {
+  position: absolute;
+  z-index: 2;
+  right: var(--s-4);
+  bottom: var(--s-4);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s-2);
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--tap);
+    padding: 0 var(--s-3);
+    border: 1px solid rgb(255 255 255 / 0.22);
+    border-radius: var(--r-control);
+    background: transparent;
+    color: #c9d6e2;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+
+    &:hover:not(:disabled) {
+      background: rgb(255 255 255 / 0.1);
+      color: #fff;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px var(--yellow-500);
+    }
+
+    &.close:hover:not(:disabled) {
+      background: var(--err-fg);
+      border-color: var(--err-fg);
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .kiosk {
+    align-content: center;
+    padding-bottom: var(--s-5);
+  }
+
+  // En pantallas angostas los controles dejan de flotar y pasan debajo.
+  .controls {
+    position: static;
+    justify-content: center;
+    margin-top: var(--s-5);
+  }
+}
