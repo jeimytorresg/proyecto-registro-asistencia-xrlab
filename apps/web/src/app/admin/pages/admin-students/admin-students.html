@@ -8,7 +8,7 @@
 
     <form class="stack" [formGroup]="form" (ngSubmit)="save()">
       <input type="hidden" formControlName="id" />
-      <div class="form-cols">
+      <div class="form-cols rows-4-3">
         <div class="field">
           <label for="s-code">Código</label>
           <input id="s-code" formControlName="universityCode" />
@@ -25,7 +25,7 @@
           <label for="s-last">Apellido</label>
           <input id="s-last" formControlName="lastName" />
         </div>
-        <div class="field">
+        <div class="field third">
           <label for="s-career">Carrera</label>
           <select id="s-career" formControlName="careerId">
             <option value="">Sin carrera</option>
@@ -34,7 +34,7 @@
             }
           </select>
         </div>
-        <div class="field">
+        <div class="field third">
           <label for="s-practice">Tipo de práctica</label>
           <select id="s-practice" formControlName="practiceTypeId">
             <option value="">Sin tipo</option>
@@ -43,7 +43,7 @@
             }
           </select>
         </div>
-        <div class="field">
+        <div class="field third">
           <label for="s-teacher">Docente asignado</label>
           <select id="s-teacher" formControlName="teacherId">
             <option value="">Sin asignación</option>
@@ -77,7 +77,7 @@
       <app-empty-state title="Aún no hay estudiantes" description="Registra el primero con el formulario de arriba." />
     } @else {
       <div class="table-wrap">
-        <table class="table">
+        <table class="table even">
           <thead>
             <tr>
               <th>Código</th>
@@ -102,7 +102,7 @@
                     <button class="btn ghost sm" type="button" (click)="edit(student)">Editar</button>
                     @if (student.active) {
                       <button class="btn ghost sm" type="button" (click)="invite(student.id)">Enviar invitación</button>
-                      <button class="btn ghost sm destructive" type="button" (click)="deactivate(student.id)">Desactivar</button>
+                      <button class="btn ghost sm destructive" type="button" (click)="deactivate(student)">Desactivar</button>
                     }
                   </div>
                 </td>

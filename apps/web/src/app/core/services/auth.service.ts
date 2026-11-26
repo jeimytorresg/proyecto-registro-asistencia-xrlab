@@ -154,7 +154,7 @@ export class AuthService {
     const user = auth.currentUser;
 
     if (!user) {
-      throw new Error('Debe iniciar sesión para obtener un token.');
+      throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.');
     }
 
     return user.getIdToken(forceRefresh);
@@ -311,7 +311,7 @@ export class AuthService {
     if (error instanceof HttpErrorResponse) {
       return (
         error.error?.error?.message ??
-        'No se pudo validar la sesión con el backend.'
+        'No pudimos validar tu sesión. Inténtalo de nuevo.'
       );
     }
 
@@ -323,19 +323,19 @@ export class AuthService {
     ) {
       switch (error.code) {
         case 'auth/invalid-api-key':
-          return 'La apiKey de Firebase en environment.development.ts no es válida.';
+          return 'No pudimos conectar con el servicio de acceso. Avisa a un administrador.';
         case 'auth/invalid-credential':
         case 'auth/wrong-password':
         case 'auth/user-not-found':
           return 'Correo o contraseña incorrectos.';
         case 'auth/too-many-requests':
-          return 'Demasiados intentos. Espere un momento y vuelva a intentar.';
+          return 'Demasiados intentos. Espera un momento y vuelve a intentarlo.';
         case 'auth/network-request-failed':
-          return 'No hay conexión con Firebase Auth.';
+          return 'No hay conexión. Revisa tu internet e inténtalo de nuevo.';
         case 'auth/emulator-config-failed':
-          return 'Firebase Auth Emulator ya fue configurado o se configuró demasiado tarde.';
+          return 'No pudimos preparar el acceso. Recarga la página e inténtalo de nuevo.';
         default:
-          return `No se pudo iniciar sesión. Código: ${error.code}`;
+          return 'No pudimos iniciar tu sesión. Inténtalo de nuevo.';
       }
     }
 
@@ -343,6 +343,6 @@ export class AuthService {
       return error.message;
     }
 
-    return 'No se pudo iniciar sesión.';
+    return 'No pudimos iniciar tu sesión. Inténtalo de nuevo.';
   }
 }

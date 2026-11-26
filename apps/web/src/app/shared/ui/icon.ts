@@ -6,7 +6,17 @@ import { LucideAngularModule, type LucideIconData } from 'lucide-angular';
   selector: 'app-icon',
   imports: [LucideAngularModule],
   template: `<lucide-angular [img]="icon()" [size]="size()" [strokeWidth]="1.75" aria-hidden="true" />`,
-  host: { style: 'display: inline-flex; flex: none;' },
+  styles: `
+    :host {
+      display: inline-flex;
+      flex: none;
+    }
+
+    /* El elemento de lucide es inline por defecto y su svg se apoya en la línea base: se centra con flex. */
+    lucide-angular {
+      display: flex;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Icon {

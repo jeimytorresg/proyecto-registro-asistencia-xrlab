@@ -10,15 +10,30 @@
     </div>
     <div class="field">
       <label for="a-action">Acción</label>
-      <input id="a-action" formControlName="action" />
+      <select id="a-action" formControlName="action">
+        <option value="">Todas</option>
+        @for (option of actionOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </div>
     <div class="field">
       <label for="a-entity">Sobre qué</label>
-      <input id="a-entity" formControlName="entityType" />
+      <select id="a-entity" formControlName="entityType">
+        <option value="">Todo</option>
+        @for (option of entityOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </div>
     <div class="field">
       <label for="a-source">Origen</label>
-      <input id="a-source" formControlName="source" />
+      <select id="a-source" formControlName="source">
+        <option value="">Todos</option>
+        @for (option of sourceOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </div>
     <div class="filter-actions">
       <button class="btn" type="submit">Filtrar</button>
@@ -59,9 +74,9 @@
                     <small>{{ fmt.role(row.actorRole) }}</small>
                   }
                 </td>
-                <td data-label="Acción">{{ row.action }}</td>
-                <td data-label="Sobre qué">{{ row.entityType }}</td>
-                <td data-label="Origen">{{ row.source }}</td>
+                <td data-label="Acción">{{ fmt.auditAction(row.action) }}</td>
+                <td data-label="Sobre qué">{{ fmt.auditEntity(row.entityType) }}</td>
+                <td data-label="Origen">{{ fmt.auditSource(row.source) }}</td>
                 <td data-label="Motivo">{{ row.reason ?? '—' }}</td>
               </tr>
             }

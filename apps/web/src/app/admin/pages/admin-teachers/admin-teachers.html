@@ -46,7 +46,7 @@
       <app-empty-state title="Aún no hay docentes" description="Registra el primero con el formulario de arriba." />
     } @else {
       <div class="table-wrap">
-        <table class="table">
+        <table class="table even">
           <thead>
             <tr>
               <th>Docente</th>
@@ -69,7 +69,7 @@
                     <button class="btn ghost sm" type="button" (click)="edit(teacher)">Editar</button>
                     @if (teacher.active) {
                       <button class="btn ghost sm" type="button" (click)="invite(teacher.id)">Enviar invitación</button>
-                      <button class="btn ghost sm destructive" type="button" (click)="deactivate(teacher.id)">Desactivar</button>
+                      <button class="btn ghost sm destructive" type="button" (click)="deactivate(teacher)">Desactivar</button>
                     }
                   </div>
                 </td>

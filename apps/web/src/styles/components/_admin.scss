@@ -57,6 +57,39 @@
   align-items: start;
 }
 
+// Formulario de 7 campos: 4 de un cuarto + 3 de un tercio; las dos filas llenan el ancho.
+.form-cols.rows-4-3 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+
+  > .field {
+    grid-column: span 3;
+  }
+
+  > .field.third {
+    grid-column: span 4;
+  }
+}
+
+@media (max-width: 960px) {
+  .form-cols.rows-4-3 {
+    > .field,
+    > .field.third {
+      grid-column: span 6;
+    }
+
+    > .field.third:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .form-cols.rows-4-3 > .field,
+  .form-cols.rows-4-3 > .field.third {
+    grid-column: 1 / -1;
+  }
+}
+
 .form-cols .wide {
   grid-column: 1 / -1;
 }

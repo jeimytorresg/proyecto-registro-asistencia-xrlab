@@ -63,10 +63,26 @@
     margin-top: 0.125rem;
   }
 
+  // Columnas de igual ancho que llenan la fila (tablas cortas de gestión).
+  &.even {
+    table-layout: fixed;
+
+    td,
+    th {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  // Acciones de la fila en lista: una debajo de otra, alineadas con el texto de la columna.
   td .row-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-1) var(--s-2);
+    display: grid;
+    justify-items: start;
+    gap: 2px;
+
+    .btn.ghost {
+      min-height: 32px;
+      margin-left: calc(var(--s-3) * -1);
+    }
   }
 }
 

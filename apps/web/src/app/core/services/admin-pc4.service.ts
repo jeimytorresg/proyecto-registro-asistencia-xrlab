@@ -112,7 +112,7 @@ export class AdminPc4Service {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(text || 'No se pudo exportar el Excel.');
+      throw new Error(text || 'No se pudo exportar a Excel. Inténtalo de nuevo.');
     }
 
     const blob = await response.blob();

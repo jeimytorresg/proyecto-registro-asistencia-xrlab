@@ -57,10 +57,13 @@ export class ApiClientService {
 
   private mapHttpError(error: unknown): Error {
     if (error instanceof HttpErrorResponse) {
+      // status 0: no hubo respuesta (sin internet o servidor apagado)
       const message =
         error.error?.error?.message ??
         error.error?.message ??
-        'No se pudo completar la solicitud al backend.';
+        (error.status === 0
+          ? 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.'
+          : 'No se pudo completar la solicitud. Inténtalo de nuevo.');
 
       return new Error(message);
     }
@@ -69,6 +72,6 @@ export class ApiClientService {
       return error;
     }
 
-    return new Error('No se pudo completar la solicitud al backend.');
+    return new Error('No se pudo completar la solicitud. Inténtalo de nuevo.');
   }
 }
