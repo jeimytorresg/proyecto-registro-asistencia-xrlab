@@ -101,7 +101,9 @@
                   <div class="row-actions">
                     <button class="btn ghost sm" type="button" (click)="edit(student)">Editar</button>
                     @if (student.active) {
-                      <button class="btn ghost sm" type="button" (click)="invite(student.id)">Enviar invitación</button>
+                      @if (isAdmin) {
+                        <button class="btn ghost sm" type="button" (click)="resetAccess(student)">Restablecer acceso</button>
+                      }
                       <button class="btn ghost sm destructive" type="button" (click)="deactivate(student)">Desactivar</button>
                     }
                   </div>

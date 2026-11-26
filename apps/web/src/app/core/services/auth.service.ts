@@ -6,7 +6,6 @@ import {
   connectAuthEmulator,
   getAuth,
   onIdTokenChanged,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   type Auth,
@@ -14,7 +13,7 @@ import {
 } from 'firebase/auth';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import type { ApiResponse, AuthSession } from '../models/auth.models';
+import type { ApiResponse, AuthSession, AccessStatus } from '../models/auth.models';
 
 type AuthStatus = 'loading' | 'anonymous' | 'authenticated' | 'error';
 
@@ -160,11 +159,45 @@ export class AuthService {
     return user.getIdToken(forceRefresh);
   }
 
-  /** Envía el correo de Firebase para que el usuario defina su contraseña. */
-  async sendInvitationEmail(email: string): Promise<void> {
-    await sendPasswordResetEmail(this.getFirebaseAuth(), email, {
-      url: `${window.location.origin}/login`,
+  /** Indica si el correo debe crear su contraseña (primer ingreso) o iniciar sesión. */
+  async getAccessStatus(email: string): Promise<AccessStatus> {
+    const data = await this.postPublic<{ status: AccessStatus }>('/auth/access-status', {
+      email: email.trim(),
     });
+
+    return data.status;
+  }
+
+  /** Primer ingreso: guarda la contraseña de la cuenta. Después se inicia sesión con `login`. */
+  async completeFirstAccess(
+    email: string,
+    password: string,
+    passwordConfirmation: string,
+  ): Promise<void> {
+    await this.postPublic<{ email: string }>('/auth/first-access', {
+      email: email.trim(),
+      password,
+      passwordConfirmation,
+    });
+  }
+
+  /** Llamadas a endpoints públicos de /auth (sin token de Firebase). */
+  private async postPublic<T>(path: string, body: object): Promise<T> {
+    let response: ApiResponse<T>;
+
+    try {
+      response = await firstValueFrom(
+        this.http.post<ApiResponse<T>>(`${environment.apiBaseUrl}${path}`, body),
+      );
+    } catch (error) {
+      throw new Error(this.mapAuthError(error));
+    }
+
+    if (!response.ok) {
+      throw new Error(response.error.message);
+    }
+
+    return response.data;
   }
 
   private initializeAuthListenerSafely(): void {

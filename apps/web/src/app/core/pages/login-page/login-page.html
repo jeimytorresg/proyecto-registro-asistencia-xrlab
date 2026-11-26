@@ -1,11 +1,11 @@
 <div class="login">
   <div class="form-side">
     <form class="login-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <h1>Iniciar sesión</h1>
-      <p class="intro">Ingresa con tu correo institucional para continuar.</p>
+      <h1>{{ copy().title }}</h1>
+      <p class="intro">{{ copy().intro }}</p>
 
       @if (error(); as currentError) {
-        <app-alert kind="err" title="No pudimos iniciar tu sesión">{{ currentError }}</app-alert>
+        <app-alert kind="err" title="No pudimos continuar">{{ currentError }}</app-alert>
       }
 
       <div class="field">
@@ -17,6 +17,7 @@
           autocomplete="email"
           inputmode="email"
           placeholder="nombre@dominio.com"
+          [readOnly]="step() !== 'email'"
           [attr.aria-invalid]="emailError() ? 'true' : null"
           [attr.aria-describedby]="emailError() ? 'email-error' : null"
         />
@@ -25,35 +26,92 @@
         }
       </div>
 
-      <div class="field">
-        <label for="password">Contraseña</label>
-        <div class="password">
-          <input
-            id="password"
-            [type]="showPassword() ? 'text' : 'password'"
-            formControlName="password"
-            autocomplete="current-password"
-            [attr.aria-invalid]="passwordError() ? 'true' : null"
-            [attr.aria-describedby]="passwordError() ? 'password-error' : null"
-          />
-          <button
-            class="toggle"
-            type="button"
-            [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-            [attr.aria-pressed]="showPassword()"
-            (click)="showPassword.set(!showPassword())"
-          >
-            <app-icon [icon]="showPassword() ? icons.eyeOff : icons.eye" [size]="20" />
-          </button>
-        </div>
-        @if (passwordError(); as message) {
-          <span class="error" id="password-error">{{ message }}</span>
+      @switch (step()) {
+        @case ('password') {
+          <div class="field">
+            <label for="password">Contraseña</label>
+            <div class="password">
+              <input
+                id="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="current-password"
+                [attr.aria-invalid]="passwordError() ? 'true' : null"
+                [attr.aria-describedby]="passwordError() ? 'password-error' : null"
+              />
+              <button
+                class="toggle"
+                type="button"
+                [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                [attr.aria-pressed]="showPassword()"
+                (click)="showPassword.set(!showPassword())"
+              >
+                <app-icon [icon]="showPassword() ? icons.eyeOff : icons.eye" [size]="20" />
+              </button>
+            </div>
+            @if (passwordError(); as message) {
+              <span class="error" id="password-error">{{ message }}</span>
+            }
+          </div>
         }
-      </div>
+
+        @case ('first-access') {
+          <div class="field">
+            <label for="new-password">Nueva contraseña</label>
+            <div class="password">
+              <input
+                id="new-password"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="new-password"
+                [attr.aria-invalid]="passwordError() ? 'true' : null"
+                [attr.aria-describedby]="passwordError() ? 'password-error' : 'password-hint'"
+              />
+              <button
+                class="toggle"
+                type="button"
+                [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                [attr.aria-pressed]="showPassword()"
+                (click)="showPassword.set(!showPassword())"
+              >
+                <app-icon [icon]="showPassword() ? icons.eyeOff : icons.eye" [size]="20" />
+              </button>
+            </div>
+            @if (passwordError(); as message) {
+              <span class="error" id="password-error">{{ message }}</span>
+            } @else {
+              <span class="hint" id="password-hint">
+                Mínimo {{ passwordMinLength }} caracteres, con letras y números.
+              </span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="password-confirmation">Confirmar contraseña</label>
+            <input
+              id="password-confirmation"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="passwordConfirmation"
+              autocomplete="new-password"
+              [attr.aria-invalid]="confirmationError() ? 'true' : null"
+              [attr.aria-describedby]="confirmationError() ? 'confirmation-error' : null"
+            />
+            @if (confirmationError(); as message) {
+              <span class="error" id="confirmation-error">{{ message }}</span>
+            }
+          </div>
+        }
+      }
 
       <button class="btn block submit" type="submit" [disabled]="isSubmitting()" [attr.aria-busy]="isSubmitting()">
-        {{ isSubmitting() ? 'Validando…' : 'Ingresar' }}
+        {{ isSubmitting() ? copy().submitting : copy().submit }}
       </button>
+
+      @if (step() !== 'email') {
+        <button class="btn ghost block" type="button" [disabled]="isSubmitting()" (click)="changeEmail()">
+          Usar otro correo
+        </button>
+      }
 
       @if (showDevUsers) {
         <section class="dev-users" aria-label="Usuarios de desarrollo">

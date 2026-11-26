@@ -10,7 +10,7 @@ import type {
   CatalogPeriod,
   CatalogStudent,
   CatalogTeacher,
-  InvitationResult,
+  AccessResult,
 } from '../models/admin-pc4.models';
 import { ApiClientService } from './api-client.service';
 import { AuthService } from './auth.service';
@@ -42,33 +42,26 @@ export class AdminPc4Service {
     return this.unwrap(await this.api.post<CatalogItem, { name: string }>('/admin/practice-types', { name }));
   }
 
-  async saveStudent(body: Record<string, unknown>): Promise<CatalogStudent & InvitationResult> {
-    return this.unwrap(await this.api.post<CatalogStudent & InvitationResult, Record<string, unknown>>('/admin/students', body));
+  async saveStudent(body: Record<string, unknown>): Promise<CatalogStudent & AccessResult> {
+    return this.unwrap(await this.api.post<CatalogStudent & AccessResult, Record<string, unknown>>('/admin/students', body));
   }
 
-  async inviteStudent(id: string): Promise<string> {
-    return this.sendInvitation(`/admin/students/${id}/invitation`);
+  /** Deja la cuenta sin contraseña: la persona crea una nueva en su próximo ingreso. */
+  async resetStudentAccess(id: string): Promise<AccessResult> {
+    return this.resetAccess(`/admin/students/${id}/reset-access`);
   }
 
   async deactivateStudent(id: string): Promise<{ id: string; active: boolean }> {
     return this.unwrap(await this.api.post<{ id: string; active: boolean }, Record<string, never>>(`/admin/students/${id}/deactivate`, {}));
   }
 
-  async saveTeacher(body: Record<string, unknown>): Promise<CatalogTeacher & { invitationPending: boolean }> {
-    return this.unwrap(await this.api.post<CatalogTeacher & { invitationPending: boolean }, Record<string, unknown>>('/admin/teachers', body));
+  async saveTeacher(body: Record<string, unknown>): Promise<CatalogTeacher & { firstAccessPending: boolean }> {
+    return this.unwrap(await this.api.post<CatalogTeacher & { firstAccessPending: boolean }, Record<string, unknown>>('/admin/teachers', body));
   }
 
-  async inviteTeacher(id: string): Promise<string> {
-    return this.sendInvitation(`/admin/teachers/${id}/invitation`);
-  }
-
-  /** Envía el correo de invitación si la cuenta aún no tiene contraseña. */
-  async sendInvitationIfPending(result: InvitationResult): Promise<boolean> {
-    if (!result.invitationPending) {
-      return false;
-    }
-    await this.auth.sendInvitationEmail(result.email);
-    return true;
+  /** Deja la cuenta sin contraseña: la persona crea una nueva en su próximo ingreso. */
+  async resetTeacherAccess(id: string): Promise<AccessResult> {
+    return this.resetAccess(`/admin/teachers/${id}/reset-access`);
   }
 
   async deactivateTeacher(id: string): Promise<{ id: string; active: boolean }> {
@@ -124,10 +117,8 @@ export class AdminPc4Service {
     URL.revokeObjectURL(url);
   }
 
-  private async sendInvitation(path: string): Promise<string> {
-    const result = this.unwrap(await this.api.post<InvitationResult, Record<string, never>>(path, {}));
-    await this.auth.sendInvitationEmail(result.email);
-    return result.email;
+  private async resetAccess(path: string): Promise<AccessResult> {
+    return this.unwrap(await this.api.post<AccessResult, Record<string, never>>(path, {}));
   }
 
   private unwrap<T>(response: ApiResponse<T>): T {

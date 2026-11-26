@@ -25,14 +25,26 @@ export class AdminTeachers {
     this.error.set(null); this.message.set(null);
     try {
       const result = await this.api.saveTeacher(Object.fromEntries(Object.entries(this.form.getRawValue()).filter(([, v]) => v !== '')));
-      const invited = await this.api.sendInvitationIfPending({ email: result.institutionalEmail, invitationPending: result.invitationPending });
-      this.message.set(invited ? `Docente guardado. Enviamos una invitación a ${result.institutionalEmail} para que cree su contraseña.` : 'Docente guardado.');
+      this.message.set(result.firstAccessPending ? `Docente guardado. Para activar su cuenta, ${result.institutionalEmail} debe abrir el login, escribir su correo y crear su contraseña.` : 'Docente guardado.');
       this.clear(); await this.load();
     } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); }
   }
-  async invite(id: string): Promise<void> {
+  async resetAccess(teacher: { id: string; firstName: string; lastName: string }): Promise<void> {
+    const confirmed = await this.confirm.ask({
+      title: `¿Restablecer el acceso de ${teacher.firstName} ${teacher.lastName}?`,
+      message: 'Se borra su contraseña actual y se cierran sus sesiones. Para volver a entrar deberá crear una contraseña nueva desde el login.',
+      confirmLabel: 'Restablecer acceso',
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.error.set(null); this.message.set(null);
-    try { const email = await this.api.inviteTeacher(id); this.message.set(`Invitación enviada a ${email}.`); } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); }
+    try {
+      const r = await this.api.resetTeacherAccess(teacher.id);
+      this.message.set(`Se restableció el acceso de ${r.email}. Cuando abra el login y escriba su correo, podrá crear una nueva contraseña.`);
+    } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); }
   }
   async deactivate(teacher: { id: string; firstName: string; lastName: string }): Promise<void> { const id = teacher.id; if (!(await this.confirm.ask({ title: `¿Desactivar a ${teacher.firstName} ${teacher.lastName}?`, message: 'Ya no podrá operar en el sistema. Sus registros anteriores se conservan.', confirmLabel: 'Desactivar' }))) { return; } try { await this.api.deactivateTeacher(id); this.message.set('Docente desactivado.'); await this.load(); } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); } }
 }

@@ -1,6 +1,7 @@
-export interface InvitationResult {
+/** Estado de la cuenta de acceso tras registrar o restablecer a una persona. */
+export interface AccessResult {
   email: string;
-  invitationPending: boolean;
+  firstAccessPending: boolean;
 }
 
 export interface CatalogItem {

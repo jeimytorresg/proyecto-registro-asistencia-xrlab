@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { AdminCatalogs } from '../../../core/models/admin-pc4.models';
 import { Alert, Badge, EmptyState, Confirm } from '../../../shared/ui';
 import { AdminPc4Service } from '../../../core/services/admin-pc4.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-students',
@@ -15,6 +16,7 @@ export class AdminStudents {
 
   private readonly api = inject(AdminPc4Service);
   private readonly confirm = inject(Confirm);
+  readonly isAdmin = inject(AuthService).role() === 'ADMIN';
   private readonly fb = inject(FormBuilder);
   readonly catalogs = signal<AdminCatalogs | null>(null);
   readonly error = signal<string | null>(null);
@@ -30,14 +32,26 @@ export class AdminStudents {
     this.error.set(null); this.message.set(null);
     try {
       const result = await this.api.saveStudent(this.clean(this.form.getRawValue()));
-      const invited = await this.api.sendInvitationIfPending(result);
-      this.message.set(invited ? `Estudiante guardado. Enviamos una invitación a ${result.email} para que cree su contraseña.` : 'Estudiante guardado.');
+      this.message.set(result.firstAccessPending ? `Estudiante guardado. Para activar su cuenta, ${result.email} debe abrir el login, escribir su correo y crear su contraseña.` : 'Estudiante guardado.');
       this.clear(); await this.load();
     } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); }
   }
-  async invite(id: string): Promise<void> {
+  async resetAccess(student: { id: string; firstName: string; lastName: string }): Promise<void> {
+    const confirmed = await this.confirm.ask({
+      title: `¿Restablecer el acceso de ${student.firstName} ${student.lastName}?`,
+      message: 'Se borra su contraseña actual y se cierran sus sesiones. Para volver a entrar deberá crear una contraseña nueva desde el login.',
+      confirmLabel: 'Restablecer acceso',
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.error.set(null); this.message.set(null);
-    try { const email = await this.api.inviteStudent(id); this.message.set(`Invitación enviada a ${email}.`); } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); }
+    try {
+      const r = await this.api.resetStudentAccess(student.id);
+      this.message.set(`Se restableció el acceso de ${r.email}. Cuando abra el login y escriba su correo, podrá crear una nueva contraseña.`);
+    } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); }
   }
   async deactivate(student: { id: string; firstName: string; lastName: string }): Promise<void> { const id = student.id; if (!(await this.confirm.ask({ title: `¿Desactivar a ${student.firstName} ${student.lastName}?`, message: 'Ya no podrá registrar entradas ni salidas. Sus registros anteriores se conservan.', confirmLabel: 'Desactivar' }))) { return; } try { await this.api.deactivateStudent(id); this.message.set('Estudiante desactivado.'); await this.load(); } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo completar la acción. Inténtalo de nuevo.'); } }
   private clean(raw: any): Record<string, unknown> { return Object.fromEntries(Object.entries(raw).filter(([, value]) => value !== '')); }
