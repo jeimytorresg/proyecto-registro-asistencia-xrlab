@@ -7,7 +7,18 @@
     </button>
   </header>
 
-  <form class="filter-grid" [formGroup]="form" (ngSubmit)="load()">
+  <form class="filter-grid cols-3" [formGroup]="form" (ngSubmit)="load()">
+    <div class="field">
+      <label for="f-period">Periodo</label>
+      <select id="f-period" formControlName="periodId">
+        <option value="">Periodo activo</option>
+        @for (period of periods(); track period.id) {
+          @if (!period.isActive) {
+            <option [value]="period.id">{{ period.name }}</option>
+          }
+        }
+      </select>
+    </div>
     <div class="field">
       <label for="f-student">Estudiante</label>
       <input id="f-student" formControlName="studentEmail" placeholder="Correo, nombre o código" />
@@ -55,8 +66,8 @@
       <div class="skeleton-rows" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
     } @else if ((result()?.rows ?? []).length === 0) {
       <app-empty-state
-        title="No hay registros con esos filtros"
-        description="Prueba con otro rango de fechas o quita algún filtro."
+        title="No hay registros en este periodo con esos filtros"
+        description="Prueba con otro periodo o rango de fechas, o quita algún filtro."
       >
         <button class="btn secondary" type="button" (click)="reset()">Quitar filtros</button>
       </app-empty-state>

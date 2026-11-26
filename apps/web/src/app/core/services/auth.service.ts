@@ -309,6 +309,10 @@ export class AuthService {
 
   private mapAuthError(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
+      if (error.status >= 500) {
+        return 'Tuvimos un problema de nuestro lado. Inténtalo de nuevo en unos minutos.';
+      }
+
       return (
         error.error?.error?.message ??
         'No pudimos validar tu sesión. Inténtalo de nuevo.'

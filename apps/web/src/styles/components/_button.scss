@@ -92,3 +92,11 @@
     cursor: progress;
   }
 }
+
+// En pantallas táctiles o angostas todo botón mide al menos 44 px, también los pequeños y los de texto.
+@media (pointer: coarse), (max-width: 640px) {
+  .btn.sm,
+  .btn.ghost {
+    min-height: var(--tap);
+  }
+}

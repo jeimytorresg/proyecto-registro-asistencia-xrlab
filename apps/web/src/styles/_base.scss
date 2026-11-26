@@ -126,7 +126,10 @@ small {
   top: var(--s-2);
   left: var(--s-2);
   z-index: 100;
-  padding: var(--s-2) var(--s-4);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 var(--s-4);
   border-radius: var(--r-control);
   background: var(--blue-900);
   color: #fff;

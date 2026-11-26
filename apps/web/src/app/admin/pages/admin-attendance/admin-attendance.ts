@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import type { AttendanceListResult } from '../../../core/models/admin-pc4.models';
+import type { AttendanceListResult, CatalogPeriod } from '../../../core/models/admin-pc4.models';
 import { Alert, Badge, EmptyState, Icon } from '../../../shared/ui';
 import { fmt, SOURCE_OPTIONS, STATUS_OPTIONS } from '../../../shared/format';
 import { Download } from 'lucide-angular';
@@ -23,7 +23,11 @@ export class AdminAttendance {
   readonly result = signal<AttendanceListResult | null>(null);
   readonly error = signal<string | null>(null);
 
+  /** Periodos para elegir qué registros ver; sin elegir, el backend usa el periodo activo. */
+  readonly periods = signal<CatalogPeriod[]>([]);
+
   readonly form = this.fb.nonNullable.group({
+    periodId: [''],
     studentEmail: [''],
     status: [''],
     source: [''],
@@ -31,7 +35,18 @@ export class AdminAttendance {
     dateTo: [''],
   });
 
-  constructor() { void this.load(); }
+  constructor() {
+    void this.load();
+    void this.loadPeriods();
+  }
+
+  private async loadPeriods(): Promise<void> {
+    try {
+      this.periods.set((await this.api.catalogs()).periods);
+    } catch {
+      // Sin la lista el selector solo ofrece "Periodo activo"; el resto de la pantalla sigue funcionando.
+    }
+  }
 
   async load(): Promise<void> {
     this.error.set(null);

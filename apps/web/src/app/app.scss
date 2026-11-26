@@ -65,6 +65,10 @@
   }
 }
 
+.main-content:focus {
+  outline: none;
+}
+
 .main-content {
   flex: 1; // las pantallas a pantalla completa ocupan el alto restante
   display: flex;

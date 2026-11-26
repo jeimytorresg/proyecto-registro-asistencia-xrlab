@@ -22,9 +22,9 @@
     <app-rings class="rings" />
   </aside>
 
-  <main class="content" id="contenido">
+  <div class="content">
     <router-outlet />
-  </main>
+  </div>
 
   <nav class="bottom" aria-label="Accesos rápidos">
     @for (item of quickItems(); track item.path) {

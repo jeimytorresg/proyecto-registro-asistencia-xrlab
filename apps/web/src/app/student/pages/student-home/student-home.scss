@@ -115,8 +115,11 @@
   font-size: var(--fs-label);
 
   summary {
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
     margin-bottom: var(--s-3);
+    cursor: pointer;
   }
 }
 

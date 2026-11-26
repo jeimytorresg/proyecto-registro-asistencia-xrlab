@@ -57,6 +57,10 @@ export class ApiClientService {
 
   private mapHttpError(error: unknown): Error {
     if (error instanceof HttpErrorResponse) {
+      if (error.status >= 500) {
+        return new Error('Tuvimos un problema de nuestro lado. Inténtalo de nuevo en unos minutos.');
+      }
+
       // status 0: no hubo respuesta (sin internet o servidor apagado)
       const message =
         error.error?.error?.message ??

@@ -44,6 +44,12 @@ export class App {
   readonly roleLabel = computed(() => fmt.role(this.auth.role()));
   readonly canManage = computed(() => this.auth.role() === 'ADMIN' || this.auth.role() === 'TEACHER');
 
+  /** Lleva el foco al contenido; un href "#..." recargaría la raíz por el <base href="/">. */
+  skipToContent(event: Event): void {
+    event.preventDefault();
+    document.getElementById('contenido')?.focus();
+  }
+
   logout(): void {
     void this.auth.logout();
   }

@@ -1,4 +1,6 @@
 <div class="app-shell" [class.bare]="edgeToEdge()">
+  <a class="skip-link" href="#contenido" (click)="skipToContent($event)">Saltar al contenido</a>
+
   @if (!fullBleed()) {
     <header class="topbar">
       <p class="who">
@@ -15,7 +17,7 @@
     </header>
   }
 
-  <main class="main-content">
+  <main class="main-content" id="contenido" tabindex="-1">
     <router-outlet />
   </main>
 </div>

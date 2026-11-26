@@ -106,6 +106,23 @@
   align-items: end;
 }
 
+// Seis filtros en 3 + 3; en tablet 2 columnas y en móvil 1.
+.filter-grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 960px) {
+  .filter-grid.cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-grid.cols-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
 .filter-actions {
   grid-column: 1 / -1;
   display: flex;
