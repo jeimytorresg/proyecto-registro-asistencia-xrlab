@@ -7,7 +7,14 @@ import type { UserRole } from '../domain/roles.js';
 export interface EnsuredAuthAccount {
   uid: string;
   email: string;
-  invitationPending: boolean;
+  /** true mientras la cuenta no tenga contraseña: la define en su primer ingreso. */
+  firstAccessPending: boolean;
+}
+
+interface AuthAccountParams {
+  profileId: string;
+  role: UserRole;
+  displayName: string;
 }
 
 function isUserNotFound(error: unknown): boolean {
@@ -16,6 +23,15 @@ function isUserNotFound(error: unknown): boolean {
     error !== null &&
     (error as { code?: unknown }).code === 'auth/user-not-found'
   );
+}
+
+/** Los perfiles creados desde el panel nacen con un UID provisional `manual-…`. */
+function linkedFirebaseUid(firebaseUid: string): string | null {
+  return firebaseUid.startsWith('manual-') ? null : firebaseUid;
+}
+
+function hasPassword(user: UserRecord): boolean {
+  return user.providerData.some((provider) => provider.providerId === 'password');
 }
 
 async function findAuthUser(uid: string | null, email: string): Promise<UserRecord | null> {
@@ -39,14 +55,21 @@ async function findAuthUser(uid: string | null, email: string): Promise<UserReco
   }
 }
 
+/** Pendiente de primer ingreso = aún sin cuenta en Firebase Auth o sin contraseña definida. */
+export async function isFirstAccessPending(firebaseUid: string, email: string): Promise<boolean> {
+  const user = await findAuthUser(linkedFirebaseUid(firebaseUid), email);
+
+  return !user || !hasPassword(user);
+}
+
 /**
  * Garantiza que el perfil tenga una cuenta real en Firebase Auth con el rol en
  * sus custom claims, y guarda su UID en users_profiles. La cuenta se crea sin
- * contraseña: el usuario la define desde el correo de invitación.
+ * contraseña: el usuario la define en su primer ingreso.
  */
 export async function ensureAuthAccount(
   client: PoolClient,
-  params: { profileId: string; role: UserRole; displayName: string },
+  params: AuthAccountParams,
 ): Promise<EnsuredAuthAccount> {
   const profileResult = await client.query<{ firebase_uid: string; email: string; role: UserRole }>(
     `select firebase_uid, email::text as email, role from users_profiles where id = $1;`,
@@ -62,8 +85,7 @@ export async function ensureAuthAccount(
     throw new ApiError(409, 'EMAIL_IN_USE', 'El correo ya está registrado en XRLAB con otro rol.');
   }
 
-  const linkedUid = profile.firebase_uid.startsWith('manual-') ? null : profile.firebase_uid;
-  let user = await findAuthUser(linkedUid, profile.email);
+  let user = await findAuthUser(linkedFirebaseUid(profile.firebase_uid), profile.email);
 
   if (!user) {
     user = await adminAuth.createUser({ email: profile.email, displayName: params.displayName });
@@ -91,6 +113,34 @@ export async function ensureAuthAccount(
   return {
     uid: user.uid,
     email: profile.email,
-    invitationPending: !user.providerData.some((provider) => provider.providerId === 'password'),
+    firstAccessPending: !hasPassword(user),
   };
+}
+
+/**
+ * Deja la cuenta como pendiente de primer ingreso para que la persona cree una
+ * contraseña nueva. Firebase no permite quitar la contraseña de una cuenta, así
+ * que se elimina y se vuelve a crear vacía (con otro UID). Eso también invalida
+ * las sesiones abiertas: el UID anterior deja de existir en users_profiles.
+ */
+export async function resetAuthAccount(
+  client: PoolClient,
+  params: AuthAccountParams,
+): Promise<EnsuredAuthAccount> {
+  const account = await ensureAuthAccount(client, params);
+
+  if (account.firstAccessPending) {
+    return account;
+  }
+
+  try {
+    await adminAuth.deleteUser(account.uid);
+  } catch (error) {
+    // Un restablecimiento simultáneo ya la eliminó: se continúa igual.
+    if (!isUserNotFound(error)) {
+      throw error;
+    }
+  }
+
+  return ensureAuthAccount(client, params);
 }

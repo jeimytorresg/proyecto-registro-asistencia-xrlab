@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { ApiError } from '../http/api-error.js';
 import { sendOk } from '../http/api-response.js';
+import { parseBody } from '../http/parse-body.js';
 import { asyncHandler } from '../middleware/async-handler.js';
 import {
   requireAuth,
@@ -21,8 +22,8 @@ import {
   exportAttendanceExcel,
   listAdminCatalogs,
   listAuditLogs,
-  prepareStudentInvitation,
-  prepareTeacherInvitation,
+  resetStudentAccess,
+  resetTeacherAccess,
   saveCatalogItem,
   saveKiosk,
   savePeriod,
@@ -116,20 +117,6 @@ const manualRecordSchema = z.object({
 
 function parseQuery<T>(schema: z.ZodSchema<T>, query: unknown): T {
   const parsed = schema.safeParse(query);
-
-  if (!parsed.success) {
-    throw new ApiError(
-      400,
-      'VALIDATION_ERROR',
-      parsed.error.issues.map((issue) => issue.message).join('; '),
-    );
-  }
-
-  return parsed.data;
-}
-
-function parseBody<T>(schema: z.ZodSchema<T>, body: unknown): T {
-  const parsed = schema.safeParse(body);
 
   if (!parsed.success) {
     throw new ApiError(
@@ -262,15 +249,15 @@ adminRouter.post(
 );
 
 adminRouter.post(
-  '/students/:id/invitation',
-  requireAuth(['ADMIN', 'TEACHER']),
+  '/students/:id/reset-access',
+  requireAuth(['ADMIN']),
   asyncHandler<AuthenticatedRequest>(async (req, res) => {
-    const result = await prepareStudentInvitation({
+    const result = await resetStudentAccess({
       authUser: requireAuthUser(req),
       id: Array.isArray(req.params['id']) ? req.params['id'][0] : req.params['id'],
       requestId: String(res.locals['requestId']),
     });
-    return sendOk(res, result, 'Cuenta lista para invitación.');
+    return sendOk(res, result, 'Acceso restablecido. Deberá crear una contraseña en su próximo ingreso.');
   }),
 );
 
@@ -302,15 +289,15 @@ adminRouter.post(
 );
 
 adminRouter.post(
-  '/teachers/:id/invitation',
+  '/teachers/:id/reset-access',
   requireAuth(['ADMIN']),
   asyncHandler<AuthenticatedRequest>(async (req, res) => {
-    const result = await prepareTeacherInvitation({
+    const result = await resetTeacherAccess({
       authUser: requireAuthUser(req),
       id: Array.isArray(req.params['id']) ? req.params['id'][0] : req.params['id'],
       requestId: String(res.locals['requestId']),
     });
-    return sendOk(res, result, 'Cuenta lista para invitación.');
+    return sendOk(res, result, 'Acceso restablecido. Deberá crear una contraseña en su próximo ingreso.');
   }),
 );
 

@@ -7,7 +7,14 @@ import {
   getAdminAttendanceList,
   type AttendanceListFilters,
 } from './admin.service.js';
-import { ensureAuthAccount } from './auth-accounts.service.js';
+import { insertAudit } from './audit-log.service.js';
+import { ensureAuthAccount, resetAuthAccount } from './auth-accounts.service.js';
+
+/** Estado de la cuenta de acceso tras registrar o restablecer a una persona. */
+export interface AccessResult {
+  email: string;
+  firstAccessPending: boolean;
+}
 
 export interface CatalogItem {
   id: string;
@@ -212,48 +219,6 @@ async function assertTeacherCanAccessStudent(
   }
 }
 
-async function insertAudit(client: PoolClient, params: {
-  actorUserId: string;
-  actorRole: 'ADMIN' | 'TEACHER' | 'STUDENT';
-  action: string;
-  entityType: string;
-  entityId: string | null;
-  oldData?: unknown;
-  newData?: unknown;
-  source: string;
-  reason?: string | null;
-  requestId: string;
-}): Promise<void> {
-  await client.query(
-    `
-      insert into audit_logs (
-        actor_user_id,
-        actor_role,
-        action,
-        entity_type,
-        entity_id,
-        old_data,
-        new_data,
-        source,
-        reason,
-        request_id
-      )
-      values ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, $9, $10);
-    `,
-    [
-      params.actorUserId,
-      params.actorRole,
-      params.action,
-      params.entityType,
-      params.entityId,
-      params.oldData ? JSON.stringify(params.oldData) : null,
-      params.newData ? JSON.stringify(params.newData) : null,
-      params.source,
-      params.reason ?? null,
-      params.requestId,
-    ],
-  );
-}
 
 export async function listAdminCatalogs(authUser: AuthenticatedUser): Promise<AdminCatalogs> {
   const teacherId = await getTeacherIdForAuthUser(authUser);
@@ -387,7 +352,7 @@ export async function saveStudent(params: {
   authUser: AuthenticatedUser;
   input: SaveStudentInput;
   requestId: string;
-}): Promise<CatalogStudent & { invitationPending: boolean }> {
+}): Promise<CatalogStudent & AccessResult> {
   const client = await db.connect();
 
   try {
@@ -571,7 +536,7 @@ export async function saveStudent(params: {
       careerId: student.career_id,
       practiceTypeId: student.practice_type_id,
       active: student.active,
-      invitationPending: account.invitationPending,
+      firstAccessPending: account.firstAccessPending,
     };
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined);
@@ -581,19 +546,27 @@ export async function saveStudent(params: {
   }
 }
 
-async function prepareInvitation(params: {
+/**
+ * Restablece el acceso: la cuenta queda sin contraseña y la persona crea una
+ * nueva en su próximo ingreso. Las sesiones abiertas dejan de ser válidas.
+ * Solo ADMIN: como el primer ingreso pide solo el correo, quien restablece
+ * podría crear la contraseña él mismo y entrar con esa cuenta.
+ */
+async function resetAccess(params: {
   authUser: AuthenticatedUser;
   table: 'students' | 'teachers';
   id: string;
   role: 'STUDENT' | 'TEACHER';
   requestId: string;
-  assertAccess?: (client: PoolClient) => Promise<void>;
-}): Promise<{ email: string; invitationPending: boolean }> {
+}): Promise<AccessResult> {
+  if (params.authUser.role !== 'ADMIN') {
+    throw new ApiError(403, 'ROLE_FORBIDDEN', 'Solo el administrador puede restablecer accesos.');
+  }
+
   const client = await db.connect();
 
   try {
     await client.query('BEGIN');
-    await params.assertAccess?.(client);
 
     const result = await client.query<{ user_profile_id: string | null; first_name: string; last_name: string; active: boolean }>(
       `select user_profile_id, first_name, last_name, active from ${params.table} where id = $1;`,
@@ -606,10 +579,10 @@ async function prepareInvitation(params: {
     }
 
     if (!row.active) {
-      throw new ApiError(409, 'INACTIVE', 'No se puede invitar a un registro desactivado.');
+      throw new ApiError(409, 'INACTIVE', 'No se puede restablecer el acceso de un registro desactivado.');
     }
 
-    const account = await ensureAuthAccount(client, {
+    const account = await resetAuthAccount(client, {
       profileId: row.user_profile_id,
       role: params.role,
       displayName: `${row.first_name} ${row.last_name}`,
@@ -618,7 +591,7 @@ async function prepareInvitation(params: {
     await insertAudit(client, {
       actorUserId: params.authUser.profile.id,
       actorRole: params.authUser.role,
-      action: 'INVITATION_SENT',
+      action: 'ACCESS_RESET',
       entityType: params.table,
       entityId: params.id,
       newData: { email: account.email },
@@ -628,7 +601,7 @@ async function prepareInvitation(params: {
 
     await client.query('COMMIT');
 
-    return { email: account.email, invitationPending: account.invitationPending };
+    return { email: account.email, firstAccessPending: account.firstAccessPending };
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined);
     throw error;
@@ -637,29 +610,20 @@ async function prepareInvitation(params: {
   }
 }
 
-export async function prepareStudentInvitation(params: {
+export async function resetStudentAccess(params: {
   authUser: AuthenticatedUser;
   id: string;
   requestId: string;
-}): Promise<{ email: string; invitationPending: boolean }> {
-  const actorTeacherId = await getTeacherIdForAuthUser(params.authUser);
-  return prepareInvitation({
-    ...params,
-    table: 'students',
-    role: 'STUDENT',
-    assertAccess: (client) => assertTeacherCanAccessStudent(client, actorTeacherId, params.id),
-  });
+}): Promise<AccessResult> {
+  return resetAccess({ ...params, table: 'students', role: 'STUDENT' });
 }
 
-export async function prepareTeacherInvitation(params: {
+export async function resetTeacherAccess(params: {
   authUser: AuthenticatedUser;
   id: string;
   requestId: string;
-}): Promise<{ email: string; invitationPending: boolean }> {
-  if (params.authUser.role !== 'ADMIN') {
-    throw new ApiError(403, 'ROLE_FORBIDDEN', 'Solo el administrador puede gestionar docentes.');
-  }
-  return prepareInvitation({ ...params, table: 'teachers', role: 'TEACHER' });
+}): Promise<AccessResult> {
+  return resetAccess({ ...params, table: 'teachers', role: 'TEACHER' });
 }
 
 export async function deactivateStudent(params: {
@@ -710,7 +674,7 @@ export async function saveTeacher(params: {
   authUser: AuthenticatedUser;
   input: SaveTeacherInput;
   requestId: string;
-}): Promise<CatalogTeacher & { invitationPending: boolean }> {
+}): Promise<CatalogTeacher & { firstAccessPending: boolean }> {
   if (params.authUser.role !== 'ADMIN') {
     throw new ApiError(403, 'ROLE_FORBIDDEN', 'Solo el administrador puede gestionar docentes.');
   }
@@ -823,7 +787,7 @@ export async function saveTeacher(params: {
       firstName: teacher.first_name,
       lastName: teacher.last_name,
       active: teacher.active,
-      invitationPending: account.invitationPending,
+      firstAccessPending: account.firstAccessPending,
     };
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined);
