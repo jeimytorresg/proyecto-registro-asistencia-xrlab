@@ -1,4 +1,3 @@
-import * as logger from 'firebase-functions/logger';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import type { NextFunction, Request, Response } from 'express';
 import { adminAuth } from '../config/firebase-admin.js';
@@ -65,11 +64,7 @@ async function verifyFirebaseToken(req: Request): Promise<DecodedIdToken> {
 
   try {
     return await adminAuth.verifyIdToken(bearerToken);
-  } catch (error) {
-    logger.warn('verifyIdToken falló', {
-      code: (error as { code?: string }).code,
-      message: (error as Error).message,
-    });
+  } catch {
     throw new ApiError(
       401,
       'AUTH_INVALID_TOKEN',
