@@ -15,7 +15,7 @@
   ],
   "headers": [
     {
-      "source": "/((?:main|chunk|polyfills|styles)-[A-Za-z0-9]+\.(?:js|css))",
+      "source": "/((?:main|chunk|polyfills|styles)-[A-Za-z0-9]+\\.(?:js|css))",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
   ]
