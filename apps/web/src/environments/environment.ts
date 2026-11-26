@@ -4,11 +4,11 @@ export const environment = {
   useAuthEmulator: false,
   authEmulatorUrl: '',
   firebase: {
-    apiKey: "AIzaSyBjfEgEJcz4jKDhf-ZkU7VjtAfMa5n7-aw",
-    authDomain: "xrlab-dev.firebaseapp.com",
-    projectId: "xrlab-dev",
-    storageBucket: "xrlab-dev.firebasestorage.app",
-    messagingSenderId: "177780323510",
-    appId: "1:177780323510:web:c156f2d9e488b455126217",
+    apiKey: "AIzaSyBRGh8aWaKGQKUHxufGXcz6N8ZPpDwEItc",
+    authDomain: "xrlab-asistencia-2f3e3.firebaseapp.com",
+    projectId: "xrlab-asistencia-2f3e3",
+    storageBucket: "xrlab-asistencia-2f3e3.firebasestorage.app",
+    messagingSenderId: "1084748345218",
+    appId: "1:1084748345218:web:b5e8fc2f6f7788256c299b",
   },
 };
